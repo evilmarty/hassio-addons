@@ -1,2 +1,6 @@
-# hassio-repository
-A personal repository for home-assistant.io
+# Marty's Home Assistant Addons
+A personal repository for home-assistant.io.
+
+**Disclaimer** use at own risk.
+
+These are the addons:
