@@ -1,0 +1,39 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Start sshd service if enabled
+# ==============================================================================
+CERT_DIR=/data/letsencrypt
+WORK_DIR=/data/workdir
+QUERY='.dns | to_entries | map("export \(.key | ascii_upcase | @sh)=\(.value | @sh)") | .[]'
+
+EMAIL=$(bashio::config 'email')
+DOMAINS=$(bashio::config 'domains')
+KEYFILE=$(bashio::config 'keyfile')
+CERTFILE=$(bashio::config 'certfile')
+CHALLENGE=$(bashio::config 'challenge')
+DNS_PROVIDER=$(bashio::config 'dns.provider')
+ENV_VARS=$(bashio::jq "${__BASHIO_ADDON_CONFIG}" "$QUERY")
+
+PROVIDER_ARGUMENTS=(--path "$CERT_DIR" --email "$EMAIL" --accept-tos --domains "${DOMAINS[@]}")
+
+if [ "${CHALLENGE}" == "dns" ]; then
+    bashio::log.info "Selected DNS Provider: ${DNS_PROVIDER}"
+
+    PROPAGATION_SECONDS=60
+    if bashio::config.exists 'dns.propagation_seconds'; then
+        PROPAGATION_SECONDS="$(bashio::config 'dns.propagation_seconds')" 
+    fi
+    bashio::log.info "Use propagation seconds: ${PROPAGATION_SECONDS}"
+
+    PROVIDER_ARGUMENTS+=(--dns "$DNS_PROVIDER" --dns-timeout "$PROPAGATION_SECONDS")
+else
+    bashio::log.info "Selected http verification"
+    PROVIDER_ARGUMENTS+=(--http)
+fi
+
+eval "$ENV_VARS"
+lego "${PROVIDER_ARGUMENTS[@]}" run
+
+PRIMARY_DOMAIN="${DOMAINS[0]}"
+cp "${CERT_DIR}/certificates/${PRIMARY_DOMAIN}.key" "/ssl/$KEYFILE"
+cp "${CERT_DIR}/certificates/${PRIMARY_DOMAIN}.crt" "/ssl/$CERTFILE"
