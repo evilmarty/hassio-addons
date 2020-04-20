@@ -1,0 +1,27 @@
+{
+  "name": "Sonarr",
+  "version": "1.0.0",
+  "slug": "sonarr",
+  "description": "Sonarr is a PVR for usenet and bittorrent users.",
+  "url": "https://github.com/evilmarty/hassio-addons/tree/master/sonarr",
+  "arch": ["amd64", "aarch64", "armhf"],
+  "startup": "application",
+  "init": false,
+  "boot": "auto",
+  "services": [],
+  "webui": "http://[HOST]:[PORT:8989]",
+  "panel_icon": "mdi:selection-ellipse",
+  "ports": {
+    "8989/tcp": 8989
+  },
+  "ports_description": {
+    "8989/tcp": "The port for the Sonarr webinterface"
+  },
+  "map": ["share:rw", "ssl:ro"],
+  "environment": {
+    "PUID": 0,
+    "PGID": 0
+  },
+  "options": {},
+  "schema": {}
+}

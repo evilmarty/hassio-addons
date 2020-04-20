@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv bash
+
+UMASK_SET=${UMASK_SET:-022}
+
+umask "$UMASK_SET"
+
+cd /app/sonarr/bin || exit
+
+exec \
+	s6-setuidgid abc mono --debug NzbDrone.exe \
+	-nobrowser -data=/data/config
