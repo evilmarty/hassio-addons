@@ -1,0 +1,7 @@
+{
+  "build_from": {
+    "amd64": "linuxserver/sabnzbd:amd64-latest",
+    "armhf": "linuxserver/sabnzbd:arm32v7-latest",
+    "aarch64": "linuxserver/sabnzbd:arm64v8-latest"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "SABnzbd",
+  "version": "1.0.0",
+  "slug": "sabnzbd",
+  "description": "SABnzbd is an Open Source Binary Newsreader written in Python.",
+  "url": "https://github.com/evilmarty/hassio-addons/tree/master/sabnzbd",
+  "arch": ["amd64", "aarch64", "armhf"],
+  "startup": "application",
+  "init": false,
+  "boot": "auto",
+  "services": [],
+  "webui": "http://[HOST]:[PORT:8080]",
+  "panel_icon": "mdi:selection-ellipse",
+  "ports": {
+    "8080/tcp": 8080,
+    "9090/tcp": null
+  },
+  "ports_description": {
+    "8080/tcp": "HTTP port for the WebUI",
+    "9090/tcp": "HTTPS port for the WebUI"
+  },
+  "map": ["share:rw", "ssl:ro"],
+  "environment": {
+    "PUID": 0,
+    "PGID": 0
+  },
+  "options": {},
+  "schema": {}
+}

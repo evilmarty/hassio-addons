@@ -1,0 +1,14 @@
+#!/usr/bin/with-contenv bash
+# ==============================================================================
+# Init folder & structures
+# ==============================================================================
+mkdir -p /data/config /share/downloads /share/incomplete-downloads
+
+if [ ! -f /data/config/sabnzbd.ini ];
+then
+  cat <<CONFIG > /data/config/sabnzbd.ini
+[misc]
+download_dir = /share/incomplete-downloads
+complete_dir = /share/downloads
+CONFIG
+fi
