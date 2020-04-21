@@ -1,0 +1,7 @@
+{
+  "build_from": {
+    "amd64": "linuxserver/couchpotato:amd64-latest",
+    "armhf": "linuxserver/couchpotato:arm32v7-latest",
+    "aarch64": "linuxserver/couchpotato:arm64v8-latest"
+  }
+}

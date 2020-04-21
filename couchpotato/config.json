@@ -1,0 +1,27 @@
+{
+  "name": "CouchPotato",
+  "version": "1.0.0",
+  "slug": "couchpotato",
+  "description": "Automatic Movie Downloading via NZBs & Torrents",
+  "url": "https://github.com/evilmarty/hassio-addons/tree/master/couchpotato",
+  "arch": ["amd64", "aarch64", "armhf"],
+  "startup": "application",
+  "init": false,
+  "boot": "auto",
+  "services": [],
+  "webui": "http://[HOST]:[PORT:5050]",
+  "panel_icon": "mdi:selection-ellipse",
+  "ports": {
+    "5050/tcp": 5050
+  },
+  "ports_description": {
+    "5050/tcp": "Server port"
+  },
+  "map": ["share:rw", "ssl:ro"],
+  "environment": {
+    "PUID": 0,
+    "PGID": 0
+  },
+  "options": {},
+  "schema": {}
+}
