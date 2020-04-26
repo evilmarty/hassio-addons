@@ -14,10 +14,12 @@
   ],
   "options": {
     "interval": 5,
-    "discovery_prefix": "homeassistant"
+    "discovery_prefix": "homeassistant",
+    "debug": false
   },
   "schema": {
     "interval": "int(1,)",
-    "discovery_prefix": "str"
+    "discovery_prefix": "str",
+    "debug": "bool"
   }
 }
