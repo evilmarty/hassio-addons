@@ -12,14 +12,14 @@ INTERVAL=$(bashio::config 'interval')
 DISCOVERY_PREFIX=$(bashio::config 'discovery_prefix')
 
 function ipmi_mqtt_publish() {
-  local query=${1}
+  local query="$1" && shift
   local args=(-n 4 -r)
 
   if bashio::config.true 'debug'; then
     args+=(-t)
   fi
 
-  ipmitool -c sdr | jq --arg discovery_prefix "$DISCOVERY_PREFIX" --raw-input --raw-output "$query" | xargs ${args[@]} mosquitto_pub -h "$MQTT_HOST" -u "$MQTT_USER" -P "$MQTT_PASSWORD"
+  ipmitool -c sdr | jq --arg discovery_prefix "$DISCOVERY_PREFIX" --raw-input --raw-output "$query" | xargs ${args[@]} mosquitto_pub -h "$MQTT_HOST" -u "$MQTT_USER" -P "$MQTT_PASSWORD" "$@"
 }
 
 function discovery_config_publish() {
@@ -54,7 +54,7 @@ function discovery_config_publish() {
 QUERY
 )
 
-  ipmi_mqtt_publish "${query}"
+  ipmi_mqtt_publish "${query}" -r
 }
 
 function discovery_state_publish() {
