@@ -6,7 +6,7 @@ SABnzbd is an Open Source Binary Newsreader written in Python.
 
 ## About
 
-This add-on allows you to run SABnzbd within Home Assistant.
+This add-on allows you to run SABnzbd within Home Assistant. It is based off of [linuxserver.io's Docker image](https://github.com/linuxserver/docker-sabnzbd).
 
 ## Installation
 
