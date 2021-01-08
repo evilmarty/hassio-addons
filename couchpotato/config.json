@@ -17,7 +17,7 @@
   "ports_description": {
     "5050/tcp": "Server port"
   },
-  "map": ["share:rw", "ssl:ro"],
+  "map": ["share:rw", "ssl:ro", "media:rw"],
   "environment": {
     "PUID": 0,
     "PGID": 0

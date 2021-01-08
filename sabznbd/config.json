@@ -19,7 +19,7 @@
     "8080/tcp": "HTTP port for the WebUI",
     "9090/tcp": "HTTPS port for the WebUI"
   },
-  "map": ["share:rw", "ssl:ro"],
+  "map": ["share:rw", "ssl:ro", "media:rw"],
   "environment": {
     "PUID": 0,
     "PGID": 0

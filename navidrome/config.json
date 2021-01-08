@@ -18,7 +18,7 @@
   "ports_description": {
     "4533/tcp": "The port for the Navidrome webinterface"
   },
-  "map": ["share:rw", "ssl:ro"],
+  "map": ["share:rw", "ssl:ro", "media:rw"],
   "environment": {
     "ND_CONFIGFILE": "/data/options.json",
     "ND_DATAFOLDER": "/data",

@@ -17,7 +17,7 @@
   "ports_description": {
     "8989/tcp": "The port for the Sonarr webinterface"
   },
-  "map": ["share:rw", "ssl:ro"],
+  "map": ["share:rw", "ssl:ro", "media:rw"],
   "environment": {
     "PUID": 0,
     "PGID": 0
