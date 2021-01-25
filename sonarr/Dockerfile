@@ -1,4 +1,3 @@
-ARG BUILD_FROM=linuxserver/sonarr:amd64-latest
-FROM $BUILD_FROM
+FROM linuxserver/sonarr:amd64-latest
 
 COPY rootfs /
