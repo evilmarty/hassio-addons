@@ -4,6 +4,7 @@
   "slug": "sabnzbd",
   "description": "SABnzbd is an Open Source Binary Newsreader written in Python.",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/sabznbd",
+  "image": "evilmarty/hassio-sabnzbd",
   "arch": ["amd64", "aarch64", "armhf"],
   "startup": "application",
   "init": false,
