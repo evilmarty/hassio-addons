@@ -1,4 +1,3 @@
-ARG BUILD_FROM=linuxserver/lidarr:amd64-latest
-FROM $BUILD_FROM
+FROM linuxserver/lidarr:amd64-latest
 
 COPY rootfs /
