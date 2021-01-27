@@ -1,4 +1,3 @@
-ARG BUILD_FROM=linuxserver/radarr:amd64-latest
-FROM $BUILD_FROM
+FROM linuxserver/radarr:amd64-latest
 
 COPY rootfs /

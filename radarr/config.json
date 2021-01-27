@@ -4,7 +4,12 @@
   "slug": "radarr",
   "description": "A fork of Sonarr to work with movies à la Couchpotato.",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/radarr",
-  "arch": ["amd64", "aarch64", "armhf"],
+  "image": "evilmarty/hassio-radarr",
+  "arch": [
+    "amd64",
+    "aarch64",
+    "armhf"
+  ],
   "startup": "application",
   "init": false,
   "boot": "auto",
@@ -17,7 +22,11 @@
   "ports_description": {
     "8989/tcp": "The port for the Radarr webinterface"
   },
-  "map": ["share:rw", "ssl:ro", "media:rw"],
+  "map": [
+    "share:rw",
+    "ssl:ro",
+    "media:rw"
+  ],
   "environment": {
     "PUID": 0,
     "PGID": 0
