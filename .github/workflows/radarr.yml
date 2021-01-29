@@ -50,7 +50,7 @@ jobs:
           echo "::set-output name=version::${EXT_VERSION}"
 
       - name: Push to Docker Hub
-        if: ${{ steps.config.outputs.version }} != ${{ steps.image.outputs.version }}
+        if: steps.config.outputs.version != steps.image.outputs.version
         uses: docker/build-push-action@v1
         with:
           path: ${{ github.workflow }}
