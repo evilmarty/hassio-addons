@@ -6,78 +6,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ github.workflow }}
-    outputs:
-      config_version: ${{ steps.config.outputs.version }}
-      image_version: ${{ steps.image.outputs.version }}
-    steps:
-      - uses: actions/checkout@v2.3.3
-
-      - id: config
-        name: Extract config version
-        run: |
-          CONFIG_VERSION=$(jq -r '.version' config.json)
-          CONFIG_IMAGE=$(jq -r '.image' config.json)
-          echo "::set-output name=version::${CONFIG_VERSION}"
-          echo "::set-output name=image::${CONFIG_IMAGE}"
-
-      - id: image
-        name: Fetch image version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          image_tag=$(awk '{if ($1 == "FROM") {print $2}}' Dockerfile)
-          image=$(echo ${image_tag} | awk -F':' '{print $1}')
-          tag=$(echo ${image_tag} | awk -F':' '{print $2}')
-          token=$(curl -sG --data-urlencode "scope=repository:${image_tag}:pull"\
-            'https://ghcr.io/token' \
-            | jq -r '.token')
-          digest=$(curl -s \
-            --header 'Accept: application/vnd.docker.distribution.manifest.v2+json' \
-            --header "Authorization: Bearer ${token}" \
-            "https://ghcr.io/v2/${image}/manifests/${tag}" \
-            | jq -r '.config.digest')
-          image_info=$(curl -sL \
-            --header "Authorization: Bearer ${token}" \
-            "https://ghcr.io/v2/${image}/blobs/${digest}" \
-            | jq -r '.container_config')
-          EXT_RELEASE=$(echo ${image_info} | jq -r '.Labels.build_version' | awk '{print $3}')
-          EXT_VERSION=$(echo ${EXT_RELEASE} | awk -F'-ls' '{print $1}')
-          echo "::set-output name=version::${EXT_VERSION}"
-
-      - name: Push to Docker Hub
-        if: steps.config.outputs.version != steps.image.outputs.version
-        uses: docker/build-push-action@v1
-        with:
-          path: ${{ github.workflow }}
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ steps.config.outputs.image }}
-          tags: ${{ steps.image.outputs.version }}
-          build_args:
-          add_git_labels: true
-          push: true
-
-  update:
-    needs: [ build ]
+  trigger:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.3
-        with:
-          ref: ${{ github.head_ref }}
-
-      - working-directory: ${{ github.workflow }}
+      - name: Trigger workflow
         env:
-          IMAGE_VERSION: ${{ needs.build.outputs.image_version }}
+          PTA: ${{ secrets.PTA }}
         run: |
-          jq --arg version "$IMAGE_VERSION" '. + {version: $version}' config.json > updated-config.json
-          mv -f updated-config.json config.json
-
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Version bump ${{ github.workflow }} to ${{ needs.build.outputs.image_version }}
-          file_pattern: ${{ github.workflow }}/config.json
+          curl --fail --silent -X POST \
+            -H "Authorization: token $PTA" \
+            -H "Accept: application/vnd.github.v3+json" \
+            'https://api.github.com/repos/${{ github.repository }}/actions/workflows/build-update.yml/dispatches' \
+            -d '{"ref":"${{ github.ref }}","inputs":{"name":"sonarr"}}'
