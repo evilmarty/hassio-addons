@@ -9,5 +9,7 @@ These are the addons:
 * [IPMI](ipmi/README.md) - Add IPMI sensor support to Home Assistant.
 * [Sonarr](sonarr/README.md) - Run Sonarr within Home Assistant.
 * [Radarr](radarr/README.md) - Run Radarr within Home Assistant.
+* [Lidarr](lidarr/README.md) - Run Lidarr within Home Assistant.
 * [SABnzbd](sabnzbd/README.md) - Run SABnzbd within Home Assistant.
 * [CouchPotato](couchpotato/README.md) - Run CouchPotato within Home Assistant.
+* [Navidrome](navidrome/README.md) - Run Navidrome within Home Assistant.
