@@ -28,8 +28,8 @@
     "media:rw"
   ],
   "environment": {
-    "PUID": 0,
-    "PGID": 0
+    "PUID": "0",
+    "PGID": "0"
   },
   "options": {},
   "schema": {}
