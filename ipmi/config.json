@@ -10,7 +10,7 @@
   "boot": "auto",
   "services": ["mqtt:need"],
   "devices": [
-    "/dev/ipmi0:/dev/ipmi0:rwm"
+    "/dev/ipmi0"
   ],
   "options": {
     "interval": 5,
