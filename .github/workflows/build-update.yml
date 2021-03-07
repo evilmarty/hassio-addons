@@ -1,41 +1,38 @@
 name: build and update
 
 on:
+  schedule:
+    - cron: '51 * * * *'
   workflow_dispatch:
-    inputs:
-      name:
-        description: 'The add-on name'
-        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{ github.event.inputs.name }}
-    outputs:
-      config_version: ${{ steps.config.outputs.version }}
-      image_version: ${{ steps.image.outputs.version }}
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        addon: [ sabnzbd, sonarr, radarr, lidarr ]
     steps:
       - uses: actions/checkout@v2.3.3
+        with:
+          ref: ${{ github.head_ref }}
 
       - id: config
         name: Extract config version
         run: |
-          CONFIG_VERSION=$(jq -r '.version' config.json)
-          CONFIG_IMAGE=$(jq -r '.image' config.json)
+          CONFIG_VERSION=$(jq -r '.version' ${{ matrix.addon }}/config.json)
+          CONFIG_IMAGE=$(jq -r '.image' ${{ matrix.addon }}/config.json)
           echo "::set-output name=version::${CONFIG_VERSION}"
           echo "::set-output name=image::${CONFIG_IMAGE}"
 
       - id: image
         name: Fetch image version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          image_tag=$(awk '{if ($1 == "FROM") {print $2}}' Dockerfile)
+          image_tag=$(awk '{if ($1 == "FROM") {print $2}}' ${{ matrix.addon }}/Dockerfile)
           image=$(echo ${image_tag} | awk -F':' '{print $1}')
           tag=$(echo ${image_tag} | awk -F':' '{print $2}')
-          token=$(curl -sG --data-urlencode "scope=repository:${image_tag}:pull"\
+          token=$(curl -sG --data-urlencode "scope=repository:${image_tag}:pull" \
             'https://ghcr.io/token' \
             | jq -r '.token')
           digest=$(curl -s \
@@ -55,7 +52,7 @@ jobs:
         if: steps.config.outputs.version != steps.image.outputs.version
         uses: docker/build-push-action@v1
         with:
-          path: ${{ github.event.inputs.name }}
+          path: ${{ matrix.addon }}
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: ${{ steps.config.outputs.image }}
@@ -64,22 +61,13 @@ jobs:
           add_git_labels: true
           push: true
 
-  update:
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2.3.3
-        with:
-          ref: ${{ github.head_ref }}
-
-      - working-directory: ${{ github.event.inputs.name }}
-        env:
-          IMAGE_VERSION: ${{ needs.build.outputs.image_version }}
+      - env:
+          IMAGE_VERSION: ${{ steps.image.outputs.version }}
         run: |
-          jq --arg version "$IMAGE_VERSION" '. + {version: $version}' config.json > updated-config.json
-          mv -f updated-config.json config.json
+          jq --arg version "$IMAGE_VERSION" '. + {version: $version}' ${{ matrix.addon }}/config.json > ${{ matrix.addon }}/updated-config.json
+          mv -f ${{ matrix.addon }}/updated-config.json ${{ matrix.addon }}/config.json
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Version bump ${{ github.event.inputs.name }} to ${{ needs.build.outputs.image_version }}
-          file_pattern: ${{ github.event.inputs.name }}/config.json
+          commit_message: Version bump ${{ matrix.addon }} to ${{ steps.image.outputs.version }}
+          file_pattern: ${{ matrix.addon }}/config.json
