@@ -49,7 +49,7 @@ jobs:
           echo "::set-output name=version::${EXT_VERSION}"
 
       - name: Push to Docker Hub
-        if: steps.config.outputs.version != steps.image.outputs.version
+        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
         uses: docker/build-push-action@v1
         with:
           path: ${{ matrix.addon }}
