@@ -61,6 +61,20 @@ jobs:
           add_git_labels: true
           push: true
 
+      - name: Push to Github Container Registry
+        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        uses: docker/build-push-action@v1
+        with:
+          path: ${{ matrix.addon }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ steps.config.outputs.image }}
+          registry: ghcr.io
+          tags: ${{ steps.image.outputs.version }}
+          build_args:
+          add_git_labels: true
+          push: true
+
       - env:
           IMAGE_VERSION: ${{ steps.image.outputs.version }}
         run: |
