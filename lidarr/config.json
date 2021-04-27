@@ -15,6 +15,7 @@
   "boot": "auto",
   "services": [],
   "webui": "http://[HOST]:[PORT:8686]",
+  "watchdog": "http://[HOST]:[PORT:8686]/initialize.js",
   "panel_icon": "mdi:selection-ellipse",
   "ports": {
     "8686/tcp": 8686
