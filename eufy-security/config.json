@@ -1,0 +1,42 @@
+{
+  "name": "Eufy Security",
+  "version": "0.0.0",
+  "slug": "eufy-security",
+  "description": "Eufy Security to MQTT Gateway intended for use with Home Assistant or other platforms that use the MQTT discovery mechanism.",
+  "url": "https://github.com/evilmarty/hassio-addons/tree/master/eufy-security",
+  "image": "evilmarty/eufy-security",
+  "arch": [
+    "amd64",
+    "aarch64",
+    "armhf"
+  ],
+  "startup": "services",
+  "init": false,
+  "boot": "auto",
+  "services": ["mqtt:need"],
+  "panel_icon": "mdi:selection-ellipse",
+  "options": {
+    "hassTopicRoot": "homeassistant",
+    "selfTopicRoot": "eufysecurity",
+    "mqttRetain": true,
+    "reconnectPeriod": 300,
+    "country": "us",
+    "language": "en",
+    "logLevel": "info",
+    "debug": false,
+    "experimental": false
+  },
+  "schema": {
+    "username": "str",
+    "password": "str",
+    "mqttRetain": "bool?",
+    "hassTopicRoot": "str?",
+    "selfTopicRoot": "str?",
+    "reconnectPeriod": "int(1,)?",
+    "country": "str?",
+    "language": "str?",
+    "logLevel": "list(info|warn|error|debug)?",
+    "debug": "bool?",
+    "experimental": "bool?"
+  }
+}

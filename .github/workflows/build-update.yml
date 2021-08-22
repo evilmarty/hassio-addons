@@ -12,7 +12,7 @@ jobs:
       max-parallel: 1
       fail-fast: false
       matrix:
-        addon: [ sabnzbd, sonarr, radarr, lidarr ]
+        addon: [ sabnzbd, sonarr, radarr, lidarr, eufy-security ]
     steps:
       - uses: actions/checkout@v2.3.3
         with:
