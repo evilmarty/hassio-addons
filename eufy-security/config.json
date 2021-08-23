@@ -1,10 +1,10 @@
 {
   "name": "Eufy Security",
-  "version": "null",
+  "version": "0.0.0",
   "slug": "eufy-security",
   "description": "Eufy Security to MQTT Gateway intended for use with Home Assistant or other platforms that use the MQTT discovery mechanism.",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/eufy-security",
-  "image": "evilmarty/eufy-security",
+  "image": "ghcr.io/evilmarty/hassio-eufy-security",
   "arch": [
     "amd64",
     "aarch64",
