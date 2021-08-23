@@ -1,3 +1,2 @@
-FROM linuxserver/radarr:amd64-latest
-
+FROM ghcr.io/linuxserver/radarr:latest
 COPY rootfs /

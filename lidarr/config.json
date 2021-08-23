@@ -4,7 +4,7 @@
   "slug": "lidarr",
   "description": "Lidarr is a music collection manager for Usenet and BitTorrent users.",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/lidarr",
-  "image": "evilmarty/hassio-lidarr",
+  "image": "ghcr.io/evilmarty/hassio-lidarr",
   "arch": [
     "amd64",
     "aarch64",

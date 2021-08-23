@@ -4,7 +4,7 @@
   "slug": "sonarr",
   "description": "Sonarr is a PVR for usenet and bittorrent users.",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/sonarr",
-  "image": "evilmarty/hassio-sonarr",
+  "image": "ghcr.io/evilmarty/hassio-sonarr",
   "arch": [
     "amd64",
     "aarch64",

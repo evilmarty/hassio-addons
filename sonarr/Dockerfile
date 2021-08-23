@@ -1,3 +1,2 @@
-FROM linuxserver/sonarr:amd64-latest
-
+FROM ghcr.io/linuxserver/sonarr:latest
 COPY rootfs /

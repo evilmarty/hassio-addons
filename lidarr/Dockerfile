@@ -1,3 +1,2 @@
-FROM linuxserver/lidarr:amd64-latest
-
+FROM ghcr.io/linuxserver/lidarr:latest
 COPY rootfs /

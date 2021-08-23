@@ -1,3 +1,2 @@
-FROM linuxserver/sabnzbd:amd64-latest
-
+FROM ghcr.io/linuxserver/sabnzbd:latest
 COPY rootfs /
