@@ -3,6 +3,8 @@
 UMASK_SET=${UMASK_SET:-022}
 umask "$UMASK_SET"
 
+cd /app/lidarr/bin || exit
+
 exec \
-  s6-setuidgid abc mono --debug /app/lidarr/bin/Lidarr.exe \
-  -nobrowser -data=/data/config
+	s6-setuidgid abc /app/lidarr/bin/Lidarr \
+	-nobrowser -data=/data/config
