@@ -40,12 +40,10 @@ jobs:
             --header "Authorization: Bearer ${token}" \
             "https://ghcr.io/v2/${image}/manifests/${tag}" \
             | jq -r '.config.digest')
-          image_info=$(curl -sL \
+          EXT_VERSION=$(curl -sL \
             --header "Authorization: Bearer ${token}" \
             "https://ghcr.io/v2/${image}/blobs/${digest}" \
-            | jq -r '.container_config')
-          EXT_RELEASE=$(echo ${image_info} | jq -r '.Labels.build_version' | awk '{print $3}')
-          EXT_VERSION=$(echo ${EXT_RELEASE} | awk -F'-ls' '{print $1}')
+            | jq -r '.container_config.Labels["org.opencontainers.image.version"]')
           echo "::set-output name=version::${EXT_VERSION}"
 
       - name: Set up QEMU
