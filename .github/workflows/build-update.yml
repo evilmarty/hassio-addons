@@ -49,7 +49,7 @@ jobs:
           EXT_VERSION=$(curl -sL \
             --header "Authorization: Bearer ${token}" \
             "https://ghcr.io/v2/${image}/blobs/${digest}" \
-            | jq -r '.container_config.Labels["org.opencontainers.image.version"]')
+            | jq -r '.container_config // .config | .Labels["org.opencontainers.image.version"]')
           echo "::set-output name=version::${EXT_VERSION}"
 
       - name: Set up QEMU
