@@ -1,21 +1,25 @@
 const fetch = require('node-fetch')
 const Bridge = require('./index')
 const options = require('/data/options.json')
-
-const res = await fetch('http://supervisor/services/mqtt', {
-  headers: {
-    'Authorization': `Bearer ${process.env.SUPERVISOR_TOKEN}`,
-  },
-})
-const payload = await res.json()
-
-if (payload.result !== 'ok') {
-  console.error('Invalid response from supervisor', payload)
+const headers = {
+  'Authorization': `Bearer ${process.env.SUPERVISOR_TOKEN}`,
 }
 
-options.mqttUsername = payload.data.username
-options.mqttPassword = payload.data.password
-options.mqttHost = payload.data.host
-options.mqttPort = payload.data.port
+fetch('http://supervisor/services/mqtt', { headers })
+  .then(res => res.json())
+  .then(({ result, data = null }) => {
+    if (result !== 'ok') {
+      throw new Error(`Invalid supervisor response: ${payload}`)
+    }
 
-new Bridge(options)
+    options.mqttUsername = data.username
+    options.mqttPassword = data.password
+    options.mqttHost = data.host
+    options.mqttPort = data.port
+
+    new Bridge(options)
+  })
+  .catch(error => {
+    console.error(error)
+    process.exit(1)
+  })
