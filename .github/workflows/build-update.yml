@@ -31,15 +31,21 @@ jobs:
         run: |
           from=$(awk '{if ($1 == "FROM") {print $2}}' ${{ matrix.addon }}/Dockerfile)
           image_tag=${from#*/}
-          image=${image%:*}
+          image=${image_tag%:*}
+          digest=${image_tag#*:}
+          media_type='application/vnd.docker.distribution.manifest.list.v2+json'
           token=$(curl -sG --data-urlencode "scope=repository:${image}:pull" \
             'https://ghcr.io/token' \
             | jq -r '.token')
-          digest=$(curl -s \
-            --header 'Accept: application/vnd.docker.distribution.manifest.v2+json' \
-            --header "Authorization: Bearer ${token}" \
-            "https://ghcr.io/v2/${image}/manifests/latest" \
-            | jq -r '.config.digest')
+          while [[ "$media_type" == 'application/vnd.docker.distribution.manifest.list.v2+json' ]]; do
+            response=$(curl -s \
+              --header 'Accept: application/vnd.docker.distribution.manifest.v2+json' \
+              --header "Authorization: Bearer ${token}" \
+              "https://ghcr.io/v2/${image}/manifests/${digest}")
+            media_type=$(echo $response | jq -r .mediaType)
+            digest=$(echo $response | jq -r '.manifests | first | .digest')
+          done
+          digest=$(echo $response | jq -r .config.digest)
           EXT_VERSION=$(curl -sL \
             --header "Authorization: Bearer ${token}" \
             "https://ghcr.io/v2/${image}/blobs/${digest}" \
