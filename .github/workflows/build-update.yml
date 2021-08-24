@@ -29,7 +29,9 @@ jobs:
       - id: image
         name: Fetch image version
         run: |
-          image=$(jq -r '.image | split("/") | .[-2:] | join("/")' ${{ matrix.addon }}/config.json)
+          from=$(awk '{if ($1 == "FROM") {print $2}}' ${{ matrix.addon }}/Dockerfile)
+          image_tag=${from#*/}
+          image=${image%:*}
           token=$(curl -sG --data-urlencode "scope=repository:${image}:pull" \
             'https://ghcr.io/token' \
             | jq -r '.token')
