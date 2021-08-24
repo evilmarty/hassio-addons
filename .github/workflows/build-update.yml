@@ -29,7 +29,7 @@ jobs:
       - id: image
         name: Fetch image version
         run: |
-          image=$(jq -r '.image | split("/") | .[-2:] | join("/")' ${{ matrx.addon }}/config.json)
+          image=$(jq -r '.image | split("/") | .[-2:] | join("/")' ${{ matrix.addon }}/config.json)
           token=$(curl -sG --data-urlencode "scope=repository:${image}:pull" \
             'https://ghcr.io/token' \
             | jq -r '.token')
