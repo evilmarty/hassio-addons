@@ -12,10 +12,10 @@ fetch('http://supervisor/services/mqtt', { headers })
       throw new Error(`Invalid supervisor response: ${payload}`)
     }
 
+    const protocol = data.ssl ? 'mqtts' : 'mqtt'
+    options.mqttUrl = `${protocol}://${data.host}:${data.port}`
     options.mqttUsername = data.username
     options.mqttPassword = data.password
-    options.mqttHost = data.host
-    options.mqttPort = data.port
 
     new Bridge(options)
   })
