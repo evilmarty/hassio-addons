@@ -7,7 +7,7 @@ const headers = {
 
 fetch('http://supervisor/services/mqtt', { headers })
   .then(res => res.json())
-  .then(({ result, data = null }) => {
+  .then(({ result, data }) => {
     if (result !== 'ok') {
       throw new Error(`Invalid supervisor response: ${payload}`)
     }
