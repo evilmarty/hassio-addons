@@ -9,8 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 1
-      fail-fast: false
+      fail-fast: true
       matrix:
         addon: [ sabnzbd, sonarr, radarr, lidarr, eufy-security ]
     steps:
