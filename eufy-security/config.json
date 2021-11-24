@@ -16,6 +16,7 @@
   "services": [
     "mqtt:need"
   ],
+  "discovery": ["mqtt"],
   "panel_icon": "mdi:selection-ellipse",
   "options": {
     "hassTopicRoot": "homeassistant",
