@@ -91,7 +91,8 @@ jobs:
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
 
-      - env:
+      - name: Update config
+        env:
           IMAGE_VERSION: ${{ steps.image.outputs.version }}
         run: |
           jq --arg version "$IMAGE_VERSION" '. + {version: $version}' ${{ matrix.addon }}/config.json > ${{ matrix.addon }}/updated-config.json
