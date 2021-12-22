@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: '0 12 * * *'
   workflow_dispatch:
+env:
+  ARCH_PLATFORMS: '{"amd64":"linux/amd64","aarch64":"linux/arm64","armhf":"linux/arm/v7"}'
 
 jobs:
   build:
@@ -22,8 +24,10 @@ jobs:
         run: |
           CONFIG_VERSION=$(jq -r '.version' ${{ matrix.addon }}/config.json)
           CONFIG_IMAGE=$(jq -r '.image' ${{ matrix.addon }}/config.json)
+          CONFIG_PLATFORMS=$(jq --argjson archs "$ARCH_PLATFORMS" -r '.arch | map($archs[.]) | map(select(.)) | join(",")' ${{ matrix.addon }}/config.json)
           echo "::set-output name=version::${CONFIG_VERSION}"
           echo "::set-output name=image::${CONFIG_IMAGE}"
+          echo "::set-output name=platforms::${CONFIG_PLATFORMS}"
 
       - id: image
         name: Fetch image version
@@ -79,6 +83,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: ${{ matrix.addon }}
+          platforms: ${{ steps.config.outputs.platforms }}
           push: true
           tags: |
             ${{ steps.config.outputs.image }}:${{ steps.image.outputs.version }}
