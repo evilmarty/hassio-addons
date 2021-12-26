@@ -1,4 +1,7 @@
 # Marty's Home Assistant Addons
+
+[![build and update](https://github.com/evilmarty/hassio-addons/actions/workflows/build-update.yml/badge.svg)](https://github.com/evilmarty/hassio-addons/actions/workflows/build-update.yml)
+
 A personal repository for home-assistant.io.
 
 **Disclaimer** use at own risk.
