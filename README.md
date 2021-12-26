@@ -13,3 +13,4 @@ These are the addons:
 * [SABnzbd](sabnzbd/README.md) - Run SABnzbd within Home Assistant.
 * [CouchPotato](couchpotato/README.md) - Run CouchPotato within Home Assistant.
 * [Navidrome](navidrome/README.md) - Run Navidrome within Home Assistant.
+* [Eufy Security](eufy-security/README.md) - Eufy Security MQTT Gateway.
