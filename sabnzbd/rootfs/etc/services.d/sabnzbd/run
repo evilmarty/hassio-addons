@@ -2,4 +2,4 @@
 
 exec \
   s6-setuidgid abc python3 /app/sabnzbd/SABnzbd.py \
-  --config-file /data/config --server 0.0.0.0:8080 --browser 0
+  --config-file /data/config --server 0.0.0.0:8080 --browser 0 --disable-file-log --console
