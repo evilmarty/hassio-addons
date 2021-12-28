@@ -1,6 +1,6 @@
 FROM ghcr.io/linuxserver/sabnzbd:latest
 RUN apt-get -qq update \
-    && apt-get -qq install --no-install-recommends -y jq \
+    && apt-get -qq install --no-install-recommends -y jq nginx \
     && (apt-get autoremove -y; apt-get autoclean -y) \
     && curl -J -L -o /tmp/bashio.tar.gz "https://github.com/hassio-addons/bashio/archive/v0.14.3.tar.gz" \
     && mkdir /tmp/bashio \
@@ -9,5 +9,5 @@ RUN apt-get -qq update \
     && ln -s /usr/lib/bashio/bashio /usr/bin/bashio \
     && curl -L -s -o /usr/bin/tempio "https://github.com/home-assistant/tempio/releases/download/2021.09.0/tempio_$(uname -m)" \
     && chmod a+x /usr/bin/tempio \
-    && rm -rf /tmp/*
+    && rm -rf /tmp/* /etc/nginx
 COPY rootfs /

@@ -4,6 +4,9 @@
 # ==============================================================================
 readonly CONFIG=/data/sabnzbd.ini
 readonly OLD_CONFIG=/data/config/sabnzbd.ini
+declare ingress_entry
+
+ingress_entry=$(bashio::addon.ingress_entry)
 
 if [ -f "$OLD_CONFIG" ]; then
   bashio::log.warning "Config found in deprecated location. Moving..."
@@ -21,8 +24,13 @@ if [ ! -f "$CONFIG" ]; then
   mkdir -p /share/downloads /share/incomplete-downloads
   cat <<CONFIG > "$CONFIG"
 [misc]
+url_base = $ingress_entry
 download_dir = /share/incomplete-downloads
 complete_dir = /share/downloads
 check_new_rel = 0
 CONFIG
+else
+  bashio::log.notice "Updating config with ingress entry..."
+  sed -i -e '/^url_base/d' -e "/\[misc\]/a\url_base = ${ingress_entry}/" "$CONFIG"
 fi
+
