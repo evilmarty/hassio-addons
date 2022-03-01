@@ -1,7 +1,5 @@
 FROM ghcr.io/linuxserver/sabnzbd:latest
-RUN apt-get -qq update \
-    && apt-get -qq install --no-install-recommends -y jq nginx \
-    && (apt-get autoremove -y; apt-get autoclean -y) \
+RUN apk add jq nginx \
     && curl -J -L -o /tmp/bashio.tar.gz "https://github.com/hassio-addons/bashio/archive/v0.14.3.tar.gz" \
     && mkdir /tmp/bashio \
     && tar zxvf /tmp/bashio.tar.gz --strip 1 -C /tmp/bashio \
