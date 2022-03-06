@@ -98,6 +98,9 @@ jobs:
           jq --arg version "$IMAGE_VERSION" '. + {version: $version}' ${{ matrix.addon }}/config.json > ${{ matrix.addon }}/updated-config.json
           mv -f ${{ matrix.addon }}/updated-config.json ${{ matrix.addon }}/config.json
 
+      - name: Pull latest changes (just in case)
+        run: git pull --rebase --depth=1
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: Version bump ${{ matrix.addon }} to ${{ steps.image.outputs.version }}
