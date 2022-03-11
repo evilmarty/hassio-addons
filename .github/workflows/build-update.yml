@@ -99,7 +99,10 @@ jobs:
           mv -f ${{ matrix.addon }}/updated-config.json ${{ matrix.addon }}/config.json
 
       - name: Pull latest changes (just in case)
-        run: git pull --rebase --depth=1
+        run: |
+          git stash
+          git pull --rebase --depth=1
+          git stash pop
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
