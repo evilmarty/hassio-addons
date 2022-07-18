@@ -1,6 +1,6 @@
 {
   "name": "SABnzbd",
-  "version": "3.6.0-ls68",
+  "version": "3.6.0-ls69",
   "slug": "sabnzbd",
   "description": "SABnzbd is an Open Source Binary Newsreader written in Python.",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/sabnzbd",
