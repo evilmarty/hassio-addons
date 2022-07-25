@@ -80,7 +80,7 @@ jobs:
 
       - name: Build and push
         if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: ${{ matrix.addon }}
           platforms: ${{ steps.config.outputs.platforms }}
