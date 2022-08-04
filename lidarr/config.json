@@ -33,5 +33,6 @@
     "PGID": "0"
   },
   "options": {},
-  "schema": {}
+  "schema": {},
+  "init": false
 }
