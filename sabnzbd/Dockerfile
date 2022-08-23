@@ -9,3 +9,4 @@ RUN apk add jq nginx \
     && chmod a+x /usr/bin/tempio \
     && rm -rf /tmp/* /etc/nginx
 COPY rootfs /
+VOLUME /data /media /share /ssl
