@@ -1,0 +1,45 @@
+schemaVersion: "2.0.0"
+
+fileExistenceTests:
+  - name: bashio (linked)
+    path: /usr/bin/bashio
+    shouldExist: true
+    permissions: "Lrwxrwxrwx"
+    uid: 0
+    gid: 0
+  - name: bashio
+    path: /usr/lib/bashio/bashio
+    shouldExist: true
+    permissions: "-rwxrwxr-x"
+    uid: 0
+    gid: 0
+  - name: tempio
+    path: /usr/bin/tempio
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 0
+    gid: 0
+  - name: SABnzbd.py
+    path: /app/sabnzbd/SABnzbd.py
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 0
+    gid: 0
+
+fileContentTests:
+  - name: SABnzbd run
+    path: /etc/services.d/sabnzbd/run
+    expectedContents:
+      - "s6-setuidgid abc python3 /app/sabnzbd/SABnzbd.py"
+      - "--server 0.0.0.0:8080"
+      - "--config-file /data .*"
+      - "--browser 0"
+      - "--disable-file-log"
+      - "--console"
+
+commandTests:
+  - name: Python 3
+    command: python3
+    args: [--version]
+    expectedOutput: ["Python 3.9."]
+    exitCode: 0

@@ -78,7 +78,18 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build container
+        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        run: docker build -t ${{ matrix.addon }}:${{ github.sha }} ${{ matrix.addon }}
+
+      - name: Test container
+        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        uses: plexsystems/container-structure-test-action@v0.2.0
+        with:
+          image: ${{ matrix.addon }}:${{ github.sha }}
+          config: ${{ matrix.addon }}/test.yaml
+
+      - name: Push container
         if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
         uses: docker/build-push-action@v3
         with:

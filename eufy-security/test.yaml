@@ -1,0 +1,13 @@
+schemaVersion: "2.0.0"
+
+commandTests:
+  - name: Node
+    command: node
+    args: [--version]
+    expectedOutput: ["v16."]
+    exitCode: 0
+  - name: Eufy Security
+    command: node
+    args: [src/cli.js, --help]
+    expectedOutput: ["Run the Eufy Security MQTT gateway"]
+    exitCode: 0

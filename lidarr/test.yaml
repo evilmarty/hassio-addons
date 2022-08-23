@@ -1,0 +1,18 @@
+schemaVersion: "2.0.0"
+
+fileExistenceTests:
+  - name: Lidarr
+    path: /app/lidarr/bin/Lidarr
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 1001
+    gid: 121
+
+fileContentTests:
+  - name: Lidarr run
+    path: /etc/services.d/lidarr/run
+    expectedContents:
+      - "s6-setuidgid abc /app/lidarr/bin/Lidarr"
+      - "-data=/data/config"
+      - "-nobrowser"
+
