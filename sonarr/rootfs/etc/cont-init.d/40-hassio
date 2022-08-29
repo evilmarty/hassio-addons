@@ -1,0 +1,31 @@
+#!/usr/bin/with-contenv bashio
+
+readonly TEMPLATE_DIR=/var/templates
+readonly SONARR_CONFIG=/data/config/config.xml
+declare options
+declare -a jq_args
+declare file
+declare file_dir
+
+if [ ! -d "$TEMPLATE_DIR" ]; then
+  bashio::log.error "Template directory is missing!"
+  exit 1
+fi
+
+jq_args=(
+  --arg Hostname "$(bashio::addon.hostname)"
+  --arg IpAddress "$(bashio::addon.ip_address)"
+  --arg Port "$(bashio::addon.port)"
+  --arg IngressEntry "$(bashio::addon.ingress_entry)"
+  --arg IngressPort $(bashio::addon.ingress_port)
+)
+options=$(bashio::addon.options | jq -r -M -c "${jq_args[@]}" '. + $ARGS.named')
+
+cd "$TEMPLATE_DIR"
+for file in $(find . -type f); do
+  file_dir=$(dirname $file)
+  mkdir -p $file_dir
+  echo "$options" | tempio -template "$file" -out "/${file}"
+  bashio::log.info "Rendered $file"
+done
+

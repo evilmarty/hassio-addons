@@ -1,0 +1,17 @@
+<Config>
+  <LogLevel>{{.log_level}}</LogLevel>
+  <EnableSsl>False</EnableSsl>
+  <Port>8989</Port>
+  <SslPort>9898</SslPort>
+  <UrlBase>{{.IngressEntry}}</UrlBase>
+  <BindAddress>*</BindAddress>
+  <ApiKey>{{if .api_key}}{{.api_key}}{{end}}</ApiKey>
+  <AuthenticationMethod>None</AuthenticationMethod>
+  <UpdateMechanism>Docker</UpdateMechanism>
+  <LaunchBrowser>False</LaunchBrowser>
+  <Branch>main</Branch>
+  <SslCertHash></SslCertHash>
+  <AnalyticsEnabled>False</AnalyticsEnabled>
+  <UpdateAutomatically>False</UpdateAutomatically>
+  <InstanceName>{{.Hostname}}</InstanceName>
+</Config>
