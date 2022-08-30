@@ -7,19 +7,94 @@ fileExistenceTests:
     permissions: "-rw-r--r--"
     uid: 0
     gid: 0
+  - name: Sonarr run
+    path: /etc/services.d/sonarr/run
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 0
+    gid: 0
+  - name: Nginx run
+    path: /etc/services.d/nginx/run
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 0
+    gid: 0
+  - name: Hassio init
+    path: /etc/cont-init.d/40-hassio
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 0
+    gid: 0
+  - name: Hassio finish
+    path: /etc/cont-finish.d/40-hassio
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 0
+    gid: 0
 
 fileContentTests:
   - name: Sonarr run
     path: /etc/services.d/sonarr/run
     expectedContents:
-      - "s6-setuidgid abc mono --debug Sonarr.exe"
+      - "s6-setuidgid abc mono --debug Sonarr\\.exe"
       - "-data=/data/config"
       - "-nobrowser"
+  - name: Nginx run
+    path: /etc/services.d/nginx/run
+    expectedContents:
+      - "bashio::net\\.wait_for 8989 localhost"
+      - "exec nginx"
+  - name: Sonarr config template
+    path: /var/templates/data/config/config.xml
+    expectedContents:
+      - "<Port>8989</Port>"
+      - "<BindAddress>\\*</BindAddress>"
+      - "<EnableSsl>False</EnableSsl>"
+      - "<UrlBase>{{.IngressEntry}}</UrlBase>"
+  - name: Nginx ingress config template
+    path: /var/templates/etc/nginx/servers/ingress.conf
+    expectedContents:
+      - "listen {{\\.IngressPort}} default_server"
+      - "allow\\s+172\\.30\\.32\\.2"
+      - "proxy_pass http://backend"
+  - name: Nginx upstream config
+    path: /etc/nginx/includes/upstream.conf
+    expectedContents:
+      - "upstream backend {"
+      - "server 127\\.0\\.0\\.1:8989"
 
 commandTests:
   - name: Mono
     command: mono
     args: [--version]
-    expectedOutput: ["Mono JIT compiler version 6.12."]
+    expectedOutput:
+      - "Mono JIT compiler version 6\\.12\\."
     exitCode: 0
+  - name: Bashio
+    command: bashio
+    expectedOutput: []
+    expectedError:
+      - "source: filename argument required"
+      - "source: usage: source filename \\[arguments\\]"
+    exitCode: 2
+  - name: Tempio
+    command: tempio
+    expectedOutput: []
+    expectedError:
+      - "Missing template argument"
+    exitCode: 1
+  - name: Nginx
+    command: nginx
+    args: [-v]
+    expectedOutput: []
+    expectedError:
+      - "nginx version: nginx/1\\.18\\.\\d+ \\(Ubuntu\\)"
 
+metadataTest:
+  entrypoint: [/init]
+  cmd: []
+  volumes:
+    - /data
+    - /media
+    - /share
+    - /ssl
