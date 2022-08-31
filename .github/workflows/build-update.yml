@@ -35,7 +35,7 @@ jobs:
           from=$(awk '{if ($1 == "FROM") {print $2}}' ${{ matrix.addon }}/Dockerfile)
           image_tag=${from#*/}
           image=${image_tag%:*}
-          digest=${image_tag#*:}
+          digest=latest
           media_type='application/vnd.docker.distribution.manifest.list.v2+json'
           token=$(curl -sG --data-urlencode "scope=repository:${image}:pull" \
             'https://ghcr.io/token' \
