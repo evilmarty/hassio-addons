@@ -16,8 +16,12 @@
   "services": [],
   "webui": "http://[HOST]:[PORT:8989]",
   "panel_icon": "mdi:selection-ellipse",
-  "ingress": true,
-  "ingress_stream": true,
+  "ports": {
+    "8989/tcp": 8989
+  },
+  "ports_description": {
+    "8989/tcp": "The port for the Sonarr webinterface"
+  },
   "map": [
     "share:rw",
     "ssl:ro",
@@ -27,12 +31,6 @@
     "PUID": "0",
     "PGID": "0"
   },
-  "options": {
-    "log_level": "error",
-    "api_key": null
-  },
-  "schema": {
-    "log_level": "list(info|warning|error|fatal|debug|trace)",
-    "api_key": "str?"
-  }
+  "options": {},
+  "schema": {}
 }

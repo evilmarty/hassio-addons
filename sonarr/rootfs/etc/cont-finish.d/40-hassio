@@ -1,8 +1,0 @@
-#!/usr/bin/with-contenv bashio
-
-readonly SONARR_CONFIG=/data/config/config.xml
-declare api_key
-
-bashio::log.info "Updating api key"
-api_key=$(grep -oPm1 "(?<=<ApiKey>)[^<]+" "$SONARR_CONFIG")
-bashio::addon.option api_key "$api_key"
