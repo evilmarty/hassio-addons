@@ -11,7 +11,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
       matrix:
         addon: [ sabnzbd, sonarr, radarr, lidarr, eufy-security ]
     steps:
