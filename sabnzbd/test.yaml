@@ -41,5 +41,5 @@ commandTests:
   - name: Python 3
     command: python3
     args: [--version]
-    expectedOutput: ["Python 3.9."]
+    expectedOutput: ["Python 3."]
     exitCode: 0
