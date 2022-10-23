@@ -10,10 +10,20 @@
     "aarch64",
     "armhf"
   ],
-  "startup": "services",
-  "panel_icon": "mdi:download-multiple",
-  "ingress": true,
-  "ingress_stream": true,
+  "startup": "application",
+  "init": false,
+  "boot": "auto",
+  "services": [],
+  "webui": "http://[HOST]:[PORT:8080]",
+  "panel_icon": "mdi:selection-ellipse",
+  "ports": {
+    "8080/tcp": 8080,
+    "9090/tcp": null
+  },
+  "ports_description": {
+    "8080/tcp": "HTTP port for the WebUI",
+    "9090/tcp": "HTTPS port for the WebUI"
+  },
   "map": [
     "share:rw",
     "ssl:ro",

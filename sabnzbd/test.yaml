@@ -1,24 +1,6 @@
 schemaVersion: "2.0.0"
 
 fileExistenceTests:
-  - name: bashio (linked)
-    path: /usr/bin/bashio
-    shouldExist: true
-    permissions: "Lrwxrwxrwx"
-    uid: 0
-    gid: 0
-  - name: bashio
-    path: /usr/lib/bashio/bashio
-    shouldExist: true
-    permissions: "-rwxrwxr-x"
-    uid: 0
-    gid: 0
-  - name: tempio
-    path: /usr/bin/tempio
-    shouldExist: true
-    permissions: "-rwxr-xr-x"
-    uid: 0
-    gid: 0
   - name: SABnzbd.py
     path: /app/sabnzbd/SABnzbd.py
     shouldExist: true
@@ -28,7 +10,7 @@ fileExistenceTests:
 
 fileContentTests:
   - name: SABnzbd run
-    path: /etc/services.d/sabnzbd/run
+    path: /etc/s6-overlay/s6-rc.d/svc-sabnzbd/run
     expectedContents:
       - "s6-setuidgid abc python3 /app/sabnzbd/SABnzbd.py"
       - "--server 0.0.0.0:8080"
@@ -43,3 +25,12 @@ commandTests:
     args: [--version]
     expectedOutput: ["Python 3."]
     exitCode: 0
+
+metadataTest:
+  exposedPorts:
+    - 8080
+  volumes:
+    - /data
+    - /media
+    - /share
+    - /ssl

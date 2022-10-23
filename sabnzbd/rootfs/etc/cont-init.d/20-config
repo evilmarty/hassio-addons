@@ -1,36 +1,17 @@
-#!/usr/bin/with-contenv bashio
+#!/usr/bin/env bash
 # ==============================================================================
 # Init folder & structures
 # ==============================================================================
 readonly CONFIG=/data/sabnzbd.ini
-readonly OLD_CONFIG=/data/config/sabnzbd.ini
-declare ingress_entry
-
-ingress_entry=$(bashio::addon.ingress_entry)
-
-if [ -f "$OLD_CONFIG" ]; then
-  bashio::log.warning "Config found in deprecated location. Moving..."
-  (
-    cd $(dirname $OLD_CONFIG)
-    find . -type d -exec mkdir -p ../{} \;
-    find . -type f -exec cp {} ../{} \;
-  )
-  bashio::log.warning "Removing deprecated config location..."
-  rm -rf $(dirname $OLD_CONFIG)
-fi
 
 if [ ! -f "$CONFIG" ]; then
-  bashio::log.info "Bootstrapping SABnzbd folders and config..."
+  echo "Bootstrapping SABnzbd folders and config..."
   mkdir -p /share/downloads /share/incomplete-downloads
   cat <<CONFIG > "$CONFIG"
 [misc]
-url_base = $ingress_entry
 download_dir = /share/incomplete-downloads
 complete_dir = /share/downloads
 check_new_rel = 0
 CONFIG
-else
-  bashio::log.notice "Updating config with ingress entry..."
-  sed -i -e '/^url_base/d' -e "/\[misc\]/a\url_base = ${ingress_entry}/" "$CONFIG"
 fi
 
