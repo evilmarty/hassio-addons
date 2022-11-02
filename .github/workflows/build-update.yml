@@ -13,6 +13,8 @@ jobs:
     strategy:
       matrix:
         addon: [ sabnzbd, sonarr, radarr, lidarr, eufy-security ]
+    env:
+      CONFIG_FILE: "${{ matrix.addon }}/config.json"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -21,9 +23,9 @@ jobs:
       - id: config
         name: Extract config version
         run: |
-          CONFIG_VERSION=$(jq -r '.version' ${{ matrix.addon }}/config.json)
-          CONFIG_IMAGE=$(jq -r '.image' ${{ matrix.addon }}/config.json)
-          CONFIG_PLATFORMS=$(jq --argjson archs "$ARCH_PLATFORMS" -r '.arch | map($archs[.]) | map(select(.)) | join(",")' ${{ matrix.addon }}/config.json)
+          CONFIG_VERSION=$(jq -r '.version' "$CONFIG_FILE")
+          CONFIG_IMAGE=$(jq -r '.image' "$CONFIG_FILE")
+          CONFIG_PLATFORMS=$(jq --argjson archs "$ARCH_PLATFORMS" -r '.arch | map($archs[.]) | map(select(.)) | join(",")' "$CONFIG_FILE")
           echo "::set-output name=version::${CONFIG_VERSION}"
           echo "::set-output name=image::${CONFIG_IMAGE}"
           echo "::set-output name=platforms::${CONFIG_PLATFORMS}"
@@ -109,8 +111,8 @@ jobs:
         env:
           IMAGE_VERSION: ${{ steps.image.outputs.version }}
         run: |
-          jq --arg version "$IMAGE_VERSION" '. + {version: $version}' ${{ matrix.addon }}/config.json > ${{ matrix.addon }}/updated-config.json
-          mv -f ${{ matrix.addon }}/updated-config.json ${{ matrix.addon }}/config.json
+          jq --arg version "$IMAGE_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
+          mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
