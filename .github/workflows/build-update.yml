@@ -26,9 +26,9 @@ jobs:
           CONFIG_VERSION=$(jq -r '.version' "$CONFIG_FILE")
           CONFIG_IMAGE=$(jq -r '.image' "$CONFIG_FILE")
           CONFIG_PLATFORMS=$(jq --argjson archs "$ARCH_PLATFORMS" -r '.arch | map($archs[.]) | map(select(.)) | join(",")' "$CONFIG_FILE")
-          echo "::set-output name=version::${CONFIG_VERSION}"
-          echo "::set-output name=image::${CONFIG_IMAGE}"
-          echo "::set-output name=platforms::${CONFIG_PLATFORMS}"
+          echo "version=${CONFIG_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "image=${CONFIG_IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "platforms=${CONFIG_PLATFORMS}" >> "$GITHUB_OUTPUT"
 
       - id: image
         name: Fetch image version
@@ -54,7 +54,7 @@ jobs:
             --header "Authorization: Bearer ${token}" \
             "https://ghcr.io/v2/${image}/blobs/${digest}" \
             | jq -r '.container_config // .config | .Labels["org.opencontainers.image.version"]')
-          echo "::set-output name=version::${EXT_VERSION}"
+          echo "version=${EXT_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Set up QEMU
         if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
