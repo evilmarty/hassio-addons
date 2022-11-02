@@ -119,3 +119,5 @@ jobs:
           git commit -m "Version bump ${{ matrix.addon }} to ${{ steps.image.outputs.version }}"
           git pull --rebase --quiet
           git push --quiet
+          test -z "<($GITHUB_STEP_SUMMARY)" && echo "# Update summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "* **${{ matrix.addon }}** updated to version ${{ steps.image.outputs.version }}" >> "$GITHUB_STEP_SUMMARY"
