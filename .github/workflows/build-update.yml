@@ -103,10 +103,6 @@ jobs:
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
 
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
       - name: Update config
         env:
           IMAGE_VERSION: ${{ steps.image.outputs.version }}
@@ -114,7 +110,12 @@ jobs:
           jq --arg version "$IMAGE_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
           mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
 
-      - uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Version bump ${{ matrix.addon }} to ${{ steps.image.outputs.version }}
-          file_pattern: ${{ matrix.addon }}/config.json
+      - name: Commit changes
+        run: |
+          git ls-files --modified --error-unmatch "$CONFIG_FILE" || exit 0
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add "$CONFIG_FILE"
+          git commit -m "Version bump ${{ matrix.addon }} to ${{ steps.image.outputs.version }}"
+          git pull --rebase --quiet
+          git push --quiet
