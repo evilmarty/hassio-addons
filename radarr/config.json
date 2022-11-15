@@ -1,6 +1,6 @@
 {
   "name": "Radarr",
-  "version": "4.2.4.6635-ls156",
+  "version": "4.2.4.6635-ls157",
   "slug": "radarr",
   "description": "A fork of Sonarr to work with movies à la Couchpotato.",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/radarr",
