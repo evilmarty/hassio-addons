@@ -1,0 +1,46 @@
+schemaVersion: "2.0.0"
+
+fileExistenceTests:
+  - name: livebook
+    path: /app/bin/livebook
+    shouldExist: true
+    permissions: "-rwxrwxrwx"
+    uid: 0
+    gid: 0
+  - name: init
+    path: /init
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 0
+    gid: 0
+
+commandTests:
+  - name: livebook
+    command: /app/bin/livebook
+    args: [version]
+    expectedOutput:
+      - "livebook 0.8.0"
+    exitCode: 0
+  - name: bashio
+    command: /usr/bin/bashio
+    args: [--help]
+    expectedOutput:
+      - "source: source filename [arguments]"
+    exitCode: 0
+  - name: jq
+    command: /usr/bin/jq
+    args: [--version]
+    expectedOutput:
+      - "jq-1.6"
+    exitCode: 0
+  - name: curl
+    command: /usr/bin/curl
+    args: [--version]
+    expectedOutput:
+      - "curl 7."
+    exitCode: 0
+
+metadataTest:
+  volumes: ["/data", "/share"]
+  entrypoint: ["/init"]
+  cmd: ["/app/bin/livebook", "start"]

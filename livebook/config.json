@@ -1,0 +1,44 @@
+{
+  "name": "Livebook",
+  "version": "0.8.0",
+  "slug": "livebook",
+  "description": "Automate code & data workflows with interactive notebooks",
+  "url": "https://github.com/evilmarty/hassio-addons/tree/master/livebook",
+  "arch": [
+    "amd64",
+    "aarch64",
+    "armhf"
+  ],
+  "startup": "application",
+  "panel_icon": "mdi:book",
+  "webui": "http://[HOST]:[PORT:8080]",
+  "watchdog": "http://[HOST]:[PORT:8080]",
+  "ports": {
+    "8080/tcp": 7070,
+    "8081/tcp": 7071
+  },
+  "port_descriptions": {
+    "8080/tcp": "The port used to serve the application",
+    "8081/tcp": "The port used to serve iframe content"
+  },
+  "map": [
+    "share:rw"
+  ],
+  "environment": {
+    "LIVEBOOK_APP_SERVICE_NAME": "hassio-livebook",
+    "LIVEBOOK_DATA_PATH": "/data",
+    "LIVEBOOK_HOME": "/share",
+    "LIVEBOOK_IFRAME_PORT": "8081",
+    "LIVEBOOK_PORT": "8080",
+    "LIVEBOOK_SHUTDOWN_ENABLED": "false",
+    "LIVEBOOK_TOKEN_ENABLED": "false",
+    "LIVEBOOK_WITHIN_IFRAME": "false"
+  },
+  "options": {},
+  "schema": {
+    "secret_base_key": "str(64,)?",
+    "password": "str?"
+  },
+  "init": false,
+  "legacy": true
+}

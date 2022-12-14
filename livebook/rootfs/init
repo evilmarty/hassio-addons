@@ -1,0 +1,16 @@
+#!/usr/bin/env bashio
+
+declare LIVEBOOK_PASSWORD
+declare LIVEBOOK_SECRET_KEY_BASE
+
+LIVEBOOK_PASSWORD=$(bashio::config 'password')
+LIVEBOOK_SECRET_KEY_BASE=$(bashio::config 'secret_key_base')
+
+if [ "$LIVEBOOK_PASSWORD" != "null" ]; then
+  export LIVEBOOK_PASSWORD
+fi
+if [ "$LIVEBOOK_SECRET_KEY_BASE" != "null" ]; then
+  export LIVEBOOK_SECRET_KEY_BASE
+fi
+
+exec "$@"
