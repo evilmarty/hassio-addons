@@ -10,6 +10,7 @@
     "armhf"
   ],
   "startup": "application",
+  "homeassistant_api": true,
   "panel_icon": "mdi:book",
   "webui": "http://[HOST]:[PORT:8080]",
   "watchdog": "http://[HOST]:[PORT:8080]",
