@@ -5,6 +5,26 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "lidarr/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "radarr/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "sonarr/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "sabnzbd/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "livebook/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "eufy-security/"
     schedule:
       interval: "weekly"
