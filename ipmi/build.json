@@ -1,5 +1,0 @@
-{
-  "build_from": {
-    "amd64": "homeassistant/amd64-base:3.11"
-  }
-}

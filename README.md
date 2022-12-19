@@ -14,7 +14,4 @@ These are the addons:
 * [Lidarr](lidarr/README.md) - Run Lidarr within Home Assistant.
 * [SABnzbd](sabnzbd/README.md) - Run SABnzbd within Home Assistant.
 * [Eufy Security](eufy-security/README.md) - Eufy Security MQTT Gateway.
-* [CouchPotato](couchpotato/README.md) - Run CouchPotato within Home Assistant. **Unmaintained**
-* [Navidrome](navidrome/README.md) - Run Navidrome within Home Assistant. **Unmaintained**
 * [Let's Encrypt](letsencrypt/README.md) - Similar to the official addon but uses the Let's Encrypt Go Client, which supports more DNS providers. **Unmaintained**
-* [IPMI](ipmi/README.md) - Add IPMI sensor support to Home Assistant. **Unmaintained**
