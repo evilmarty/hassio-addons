@@ -1,0 +1,98 @@
+name: Dependabot update config
+on: pull_request
+
+permissions:
+  pull-requests: write
+  issues: write
+  repository-projects: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    outputs:
+      directory: ${{ steps.metadata.outputs.directory }}
+      new-version: ${{ steps.metadata.outputs.new-version }}
+      package-ecosystem: ${{ steps.metadata.outputs.package-ecosystem }}
+    steps:
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    needs: dependabot
+    runs-on: ubuntu-latest
+    if: ${{ needs.dependabot.outputs.package-ecosystem == 'docker' }}
+    outputs:
+      name: ${{ steps.config.outputs.name }}
+      directory: ${{ needs.dependabot.outputs.directory }}
+      new_version: ${{ needs.dependabot.outputs.new-version }}
+    defaults:
+      run:
+        working-directory: ${{ needs.dependabot.outputs.directory }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: config
+        name: Extract config version
+        env:
+          ARCH_PLATFORMS: '{"amd64":"linux/amd64","aarch64":"linux/arm64","armhf":"linux/arm/v7"}'
+          CONFIG_FILE: config.json
+        run: |
+          jq --argjson archs "$ARCH_PLATFORMS" -r '.platforms = (.arch | map($archs[.]) | map(select(.)) | join(",")) | {name, slug, version, image, platforms} | to_entries | map("\(.key)=\(.value)") | join("\n")' "$CONFIG_FILE" >> "$GITHUB_OUTPUT"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build container
+        run: docker build -t ${{ steps.config.outputs.slug }}:${{ github.sha }} .
+      - name: Test container
+        uses: plexsystems/container-structure-test-action@v0.2.0
+        with:
+          image: ${{ steps.config.outputs.slug }}:${{ github.sha }}
+          config: ${{ needs.dependabot.outputs.directory }}/test.yaml
+      - name: Push container
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ needs.dependabot.outputs.directory }}
+          platforms: ${{ steps.config.outputs.platforms }}
+          push: true
+          tags: |
+            ${{ steps.config.outputs.slug }}:${{ needs.dependabot.outputs.new-version }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+  update:
+    needs: build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ needs.build.outputs.directory }}
+    env:
+      CONFIG_FILE: config.json
+      NEW_VERSION: ${{ needs.build.outputs.new-version }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update addon config
+        run: |
+          jq --arg version "$NEW_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
+          mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
+      - name: Commit changes
+        env:
+          ADDON: ${{ needs.build.outputs.name }}
+        run: |
+          git ls-files --modified --error-unmatch "$CONFIG_FILE" || exit 0
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add "$CONFIG_FILE"
+          git commit -m "Version bump $ADDON to $NEW_VERSION"
+          git pull --rebase --quiet
+          git push --quiet
