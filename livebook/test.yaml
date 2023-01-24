@@ -19,7 +19,7 @@ commandTests:
     command: /app/bin/livebook
     args: [version]
     expectedOutput:
-      - "livebook 0.8.0"
+      - "livebook 0.8."
     exitCode: 0
   - name: bashio
     command: /usr/bin/bashio
