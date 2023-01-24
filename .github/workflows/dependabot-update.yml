@@ -31,7 +31,7 @@ jobs:
       new_version: ${{ needs.dependabot.outputs.new-version }}
     defaults:
       run:
-        working-directory: ${{ needs.dependabot.outputs.directory }}
+        working-directory: .${{ needs.dependabot.outputs.directory }}
     steps:
       - uses: actions/checkout@v3
       - id: config
@@ -57,11 +57,11 @@ jobs:
         uses: plexsystems/container-structure-test-action@v0.2.0
         with:
           image: ${{ steps.config.outputs.slug }}:${{ github.sha }}
-          config: ${{ needs.dependabot.outputs.directory }}/test.yaml
+          config: .${{ needs.dependabot.outputs.directory }}/test.yaml
       - name: Push container
         uses: docker/build-push-action@v3
         with:
-          context: ${{ needs.dependabot.outputs.directory }}
+          context: .${{ needs.dependabot.outputs.directory }}
           platforms: ${{ steps.config.outputs.platforms }}
           push: true
           tags: |
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ needs.build.outputs.directory }}
+        working-directory: .${{ needs.build.outputs.directory }}
     env:
       CONFIG_FILE: config.json
       NEW_VERSION: ${{ needs.build.outputs.new-version }}
