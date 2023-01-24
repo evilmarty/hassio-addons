@@ -25,8 +25,8 @@ commandTests:
     command: /usr/bin/bashio
     args: [--help]
     expectedOutput:
-      - "source: source filename [arguments]"
-    exitCode: 0
+      - "source: source filename \\[arguments\\]"
+    exitCode: 2
   - name: jq
     command: /usr/bin/jq
     args: [--version]
