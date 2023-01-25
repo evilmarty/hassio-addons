@@ -4,6 +4,7 @@
   "slug": "livebook",
   "description": "Automate code & data workflows with interactive notebooks",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/livebook",
+  "image": "ghcr.io/evilmarty/hassio-livebook",
   "arch": [
     "amd64",
     "aarch64"
