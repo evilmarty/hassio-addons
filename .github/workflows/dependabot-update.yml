@@ -24,8 +24,6 @@ jobs:
       packages: write
     outputs:
       name: ${{ steps.config.outputs.name }}
-      directory: ${{ needs.dependabot.outputs.directory }}
-      new_version: ${{ needs.dependabot.outputs.new-version }}
     defaults:
       run:
         working-directory: .${{ needs.dependabot.outputs.directory }}
@@ -49,11 +47,11 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build container
-        run: docker build -t ${{ steps.config.outputs.slug }}:${{ github.sha }} .
+        run: docker build -t ${{ steps.config.outputs.image }}:${{ github.sha }} .
       - name: Test container
         uses: plexsystems/container-structure-test-action@v0.2.0
         with:
-          image: ${{ steps.config.outputs.slug }}:${{ github.sha }}
+          image: ${{ steps.config.outputs.image }}:${{ github.sha }}
           config: .${{ needs.dependabot.outputs.directory }}/test.yaml
       - name: Push container
         uses: docker/build-push-action@v3
@@ -68,19 +66,18 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
 
   update:
-    needs: build
+    needs: [dependabot, build]
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
       issues: write
-    defaults:
-      run:
-        working-directory: .${{ needs.build.outputs.directory }}
     env:
-      CONFIG_FILE: config.json
-      NEW_VERSION: ${{ needs.build.outputs.new-version }}
+      CONFIG_FILE: .${{ needs.dependabot.outputs.directory }}/config.json
+      NEW_VERSION: ${{ needs.dependabot.outputs.new-version }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
       - name: Update addon config
         run: |
           jq --arg version "$NEW_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
@@ -89,7 +86,7 @@ jobs:
         env:
           ADDON: ${{ needs.build.outputs.name }}
         run: |
-          git ls-files --modified --error-unmatch "$CONFIG_FILE" || exit 0
+          git ls-files --modified --error-unmatch -- "$CONFIG_FILE" || exit 0
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add "$CONFIG_FILE"
