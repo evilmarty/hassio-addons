@@ -6,8 +6,7 @@
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/livebook",
   "arch": [
     "amd64",
-    "aarch64",
-    "armhf"
+    "aarch64"
   ],
   "startup": "application",
   "homeassistant_api": true,
