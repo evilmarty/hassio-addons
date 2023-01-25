@@ -65,7 +65,7 @@ jobs:
           platforms: ${{ steps.config.outputs.platforms }}
           push: true
           tags: |
-            ${{ steps.config.outputs.slug }}:${{ needs.dependabot.outputs.new-version }}
+            ${{ steps.config.outputs.image }}:${{ needs.dependabot.outputs.new-version }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
