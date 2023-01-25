@@ -69,8 +69,7 @@ jobs:
     needs: [dependabot, build]
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
-      issues: write
+      contents: write
     env:
       CONFIG_FILE: .${{ needs.dependabot.outputs.directory }}/config.json
       NEW_VERSION: ${{ needs.dependabot.outputs.new-version }}
@@ -91,4 +90,4 @@ jobs:
           git config user.email github-actions@github.com
           git add "$CONFIG_FILE"
           git commit -m "Version bump $ADDON to $NEW_VERSION"
-          git push origin "$GITHUB_HEAD_REF" --quiet
+          git push --quiet
