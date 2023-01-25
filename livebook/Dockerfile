@@ -1,4 +1,4 @@
-FROM livebook/livebook:0.8.0
+FROM livebook/livebook:0.8.1
 ARG BASHIO_VERSION="0.14.3"
 RUN apt-get update \
     && apt-get install -y --no-install-recommends jq curl ca-certificates \
