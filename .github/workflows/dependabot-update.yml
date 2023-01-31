@@ -54,7 +54,7 @@ jobs:
           image: ${{ steps.config.outputs.image }}:${{ github.sha }}
           config: .${{ needs.dependabot.outputs.directory }}/test.yaml
       - name: Push container
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .${{ needs.dependabot.outputs.directory }}
           platforms: ${{ steps.config.outputs.platforms }}
