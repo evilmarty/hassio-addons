@@ -49,7 +49,7 @@ jobs:
       - name: Build container
         run: docker build -t ${{ steps.config.outputs.image }}:${{ github.sha }} .
       - name: Test container
-        uses: plexsystems/container-structure-test-action@v0.2.0
+        uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: ${{ steps.config.outputs.image }}:${{ github.sha }}
           config: .${{ needs.dependabot.outputs.directory }}/test.yaml

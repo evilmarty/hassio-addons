@@ -85,7 +85,7 @@ jobs:
 
       - name: Test container
         if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
-        uses: plexsystems/container-structure-test-action@v0.2.0
+        uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: ${{ matrix.addon }}:${{ github.sha }}
           config: ${{ matrix.addon }}/test.yaml
