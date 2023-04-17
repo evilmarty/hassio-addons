@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        addon: [ sabnzbd, sonarr, radarr, lidarr, eufy-security ]
+        addon: [ sabnzbd, sonarr, radarr, lidarr ]
     env:
       CONFIG_FILE: "${{ matrix.addon }}/config.json"
     steps:
