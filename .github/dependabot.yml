@@ -5,26 +5,6 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "docker"
-    directory: "lidarr/"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "radarr/"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "sonarr/"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "sabnzbd/"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
     directory: "livebook/"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "docker"
-    directory: "eufy-security/"
     schedule:
       interval: "daily"
