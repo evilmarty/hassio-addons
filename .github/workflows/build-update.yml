@@ -15,6 +15,7 @@ jobs:
         addon: [ sabnzbd, sonarr, radarr, lidarr ]
     env:
       CONFIG_FILE: "${{ matrix.addon }}/config.json"
+      DOCKERFILE: "${{ matrix.addon }}/Dockerfile"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -23,17 +24,14 @@ jobs:
       - id: config
         name: Extract config version
         run: |
-          CONFIG_VERSION=$(jq -r '.version' "$CONFIG_FILE")
-          CONFIG_IMAGE=$(jq -r '.image' "$CONFIG_FILE")
-          CONFIG_PLATFORMS=$(jq --argjson archs "$ARCH_PLATFORMS" -r '.arch | map($archs[.]) | map(select(.)) | join(",")' "$CONFIG_FILE")
-          echo "version=${CONFIG_VERSION}" >> "$GITHUB_OUTPUT"
-          echo "image=${CONFIG_IMAGE}" >> "$GITHUB_OUTPUT"
-          echo "platforms=${CONFIG_PLATFORMS}" >> "$GITHUB_OUTPUT"
+          jq -r '"version=\(.version)"' "$CONFIG_FILE" >> "$GITHUB_OUTPUT"
+          jq -r '"image=\(.image)"' "$CONFIG_FILE" >> "$GITHUB_OUTPUT"
+          jq --argjson archs "$ARCH_PLATFORMS" -r '.arch | map($archs[.]) | map(select(.)) | join(",") | "platforms=\(.)"' "$CONFIG_FILE" >> "$GITHUB_OUTPUT"
 
       - id: image
         name: Fetch image version
         run: |
-          from=$(awk '{if ($1 == "FROM") {print $2}}' ${{ matrix.addon }}/Dockerfile)
+          from=$(awk '{if ($1 == "FROM") {print $2}}' "$DOCKERFILE")
           image_tag=${from#*/}
           image=${image_tag%:*}
           digest=latest
@@ -50,29 +48,43 @@ jobs:
             digest=$(echo $response | jq -r '.manifests | first | .digest')
           done
           digest=$(echo $response | jq -r .config.digest)
-          EXT_VERSION=$(curl -sL \
+          ext_version=$(curl -sL \
             --header "Authorization: Bearer ${token}" \
             "https://ghcr.io/v2/${image}/blobs/${digest}" \
             | jq -r '.container_config // .config | .Labels["org.opencontainers.image.version"]')
-          echo "version=${EXT_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "version=${ext_version}" >> "$GITHUB_OUTPUT"
+          if [[ "$version" == "$image_tag" && "${{ github.event_name }}" != "workflow_dispatch" ]]; then
+            echo "skip_version=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip_version=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update files
+        if: ${{ !steps.image.outputs.skip_version }}
+        env:
+          IMAGE_VERSION: ${{ steps.image.outputs.version }}
+        run: |
+          jq --arg version "$IMAGE_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
+          sed -i -e "s/:.*/:${IMAGE_VERSION}/" "$DOCKERFILE"
+          mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
 
       - name: Set up QEMU
-        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        if: ${{ !steps.image.outputs.skip_version }}
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx
-        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        if: ${{ !steps.image.outputs.skip_version }}
         uses: docker/setup-buildx-action@v2
 
       - name: Login to DockerHub
-        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        if: ${{ !steps.image.outputs.skip_version }}
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to GHCR
-        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        if: ${{ !steps.image.outputs.skip_version }}
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
@@ -80,18 +92,18 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build container
-        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        if: ${{ !steps.image.outputs.skip_version }}
         run: docker build -t ${{ matrix.addon }}:${{ github.sha }} ${{ matrix.addon }}
 
       - name: Test container
-        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        if: ${{ !steps.image.outputs.skip_version }}
         uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: ${{ matrix.addon }}:${{ github.sha }}
           config: ${{ matrix.addon }}/test.yaml
 
       - name: Push container
-        if: steps.config.outputs.version != steps.image.outputs.version || github.event_name == 'workflow_dispatch'
+        if: ${{ !steps.image.outputs.skip_version }}
         uses: docker/build-push-action@v4
         with:
           context: ${{ matrix.addon }}
@@ -102,13 +114,6 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}
-
-      - name: Update config
-        env:
-          IMAGE_VERSION: ${{ steps.image.outputs.version }}
-        run: |
-          jq --arg version "$IMAGE_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
-          mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
 
       - name: Commit changes
         run: |
