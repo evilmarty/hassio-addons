@@ -117,11 +117,10 @@ jobs:
 
       - name: Commit changes
         run: |
-          git ls-files --modified --error-unmatch "$CONFIG_FILE" || exit 0
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add "$CONFIG_FILE"
-          git commit -m "Version bump ${{ matrix.addon }} to ${{ steps.image.outputs.version }}"
+          git add "$CONFIG_FILE" "$DOCKERFILE"
+          git commit -m "Version bump ${{ matrix.addon }} to ${{ steps.image.outputs.version }}" || exit 0
           git pull --rebase --quiet
           git push --quiet
           test -z "<($GITHUB_STEP_SUMMARY)" && echo "# Update summary" >> "$GITHUB_STEP_SUMMARY"
