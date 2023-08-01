@@ -10,9 +10,17 @@ fileExistenceTests:
 
 fileContentTests:
   - name: Radarr run
-    path: /etc/services.d/radarr/run
+    path: /etc/s6-overlay/s6-rc.d/svc-radarr/run
     expectedContents:
       - "s6-setuidgid abc /app/radarr/bin/Radarr"
       - "-data=/data/config"
       - "-nobrowser"
 
+metadataTest:
+  exposedPorts:
+    - 7878
+  volumes:
+    - /data
+    - /media
+    - /share
+    - /ssl

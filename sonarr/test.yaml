@@ -10,7 +10,7 @@ fileExistenceTests:
 
 fileContentTests:
   - name: Sonarr run
-    path: /etc/services.d/sonarr/run
+    path: /etc/s6-overlay/s6-rc.d/svc-sonarr/run
     expectedContents:
       - "s6-setuidgid abc mono --debug Sonarr.exe"
       - "-data=/data/config"
@@ -23,3 +23,11 @@ commandTests:
     expectedOutput: ["Mono JIT compiler version 6.12."]
     exitCode: 0
 
+metadataTest:
+  exposedPorts:
+    - 8989
+  volumes:
+    - /data
+    - /media
+    - /share
+    - /ssl

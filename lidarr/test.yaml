@@ -10,9 +10,17 @@ fileExistenceTests:
 
 fileContentTests:
   - name: Lidarr run
-    path: /etc/services.d/lidarr/run
+    path: /etc/s6-overlay/s6-rc.d/svc-lidarr/run
     expectedContents:
       - "s6-setuidgid abc /app/lidarr/bin/Lidarr"
       - "-data=/data/config"
       - "-nobrowser"
 
+metadataTest:
+  exposedPorts:
+    - 8686
+  volumes:
+    - /data
+    - /media
+    - /share
+    - /ssl
