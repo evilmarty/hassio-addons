@@ -5,46 +5,35 @@ on:
       - '*/Dockerfile'
       - '*/rootfs/**'
     types:
+      - opened
+      - reopened
+      - synchronize
       - closed
 
 jobs:
   inspect:
     runs-on: ubuntu-latest
     outputs:
-      addons: ${{ steps.addons.outputs.result }}
+      addons: ${{ steps.addons.outputs.changed }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/github-script@v6
-        id: addons
         with:
-          script: |
-            const { commits } = context.payload
-            const changedFiles = [
-              ...commits.added,
-              ...commits.modified,
-              ...commits.removed,
-            ]
-            let patterns = []
-            changedFiles.forEach(changedFile => {
-              const changedFolder = changedFile.split('/')[0]
-              const pattern = `${changedFolder}/Dockerfile`
-              if (!patterns.includes(pattern)) {
-                patterns.push(pattern)
-              }
-            })
-            const globber = await glob.create(patterns.join('\n'))
-            const files = await globber.glob()
-            return files.map(file => file.split('/')[0])
+          ref: master
+      - uses: actions/checkout@v3
+      - id: addons
+        name: Determine changed addons
+        run: |
+          git diff --name-only origin/master | awk -F '/' '{ print $1 }' | sort -u | xargs -I % -n 1 jq -r .slug %/config.json 2>/dev/null | jq -rnR '"changed=\([inputs]|@json)"' >> "$GITHUB_OUTPUT"
 
   build:
     needs: inspect
-    runs-on: ubuntu-latest
     strategy:
       matrix:
-        addon: ${{ needs.inspect.outputs.addons }}
+        addon: ${{ fromJSON(needs.inspect.outputs.addons) }}
     uses: ./.github/workflows/build.yml
     with:
       addon: ${{ matrix.addon }}
       publish: ${{ github.event.pull_request.merged == true }}
+      ref: ${{ github.head_ref }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
