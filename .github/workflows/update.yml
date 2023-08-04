@@ -9,6 +9,8 @@ on:
       version:
         required: true
         type: string
+      ref:
+        type: string
     outputs:
       ref:
         value: ${{ jobs.update.outputs.ref }}
@@ -25,8 +27,13 @@ jobs:
     env:
       CONFIG_FILE: "${{ inputs.addon }}/config.json"
       DOCKERFILE: "${{ inputs.addon }}/Dockerfile"
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
+          token: ${{ secrets.token }}
       - name: Update files
         env:
           NEW_VERSION: ${{ inputs.version }}

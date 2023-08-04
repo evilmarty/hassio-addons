@@ -9,10 +9,8 @@ jobs:
       addon: ${{ steps.addon.outputs.slug }}
       new-version: ${{ steps.metadata.outputs.new-version }}
       package-ecosystem: ${{ steps.metadata.outputs.package-ecosystem }}
-    defaults:
-      run:
-        working-directory: ${{ steps.metadata.outputs.directory }}
     steps:
+      - uses: actions/checkout@v3
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1.6.0
@@ -20,7 +18,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - id: addon
         run: |
-          (jq -r '"slug=\(.slug)"' config.json >> "$GITHUB_OUTPUT") || exit
+          cd .${{ steps.metadata.outputs.directory }}
+          test -f config.json || exit
+          jq -r '"slug=\(.slug)"' config.json >> "$GITHUB_OUTPUT"
 
   update:
     needs: dependabot
@@ -29,3 +29,6 @@ jobs:
     with:
       addon: ${{ needs.dependabot.outputs.addon }}
       version: ${{ needs.dependabot.outputs.new-version }}
+      ref: ${{ github.head_ref }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
