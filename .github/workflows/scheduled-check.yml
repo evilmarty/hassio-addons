@@ -1,0 +1,23 @@
+name: Scheduled check and update
+
+on:
+  schedule:
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+    inputs:
+      publish:
+        type: boolean
+        default: true
+        description: Publish the updated addons.
+
+jobs:
+  main:
+    strategy:
+      matrix:
+        addon: [ sabnzbd, sonarr, radarr, lidarr ]
+    uses: ./.github/workflows/check-update-build.yml
+    with:
+      addon: ${{ matrix.addon }}
+      publish: ${{ github.event.schedule || inputs.publish }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

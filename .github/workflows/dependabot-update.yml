@@ -1,4 +1,4 @@
-name: Dependabot update config
+name: Dependabot update addon
 on: pull_request
 
 jobs:
@@ -6,88 +6,26 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor == 'dependabot[bot]' }}
     outputs:
-      directory: ${{ steps.metadata.outputs.directory }}
+      addon: ${{ steps.addon.outputs.slug }}
       new-version: ${{ steps.metadata.outputs.new-version }}
       package-ecosystem: ${{ steps.metadata.outputs.package-ecosystem }}
+    defaults:
+      run:
+        working-directory: ${{ steps.metadata.outputs.directory }}
     steps:
       - name: Dependabot metadata
         id: metadata
         uses: dependabot/fetch-metadata@v1.6.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-  build:
-    needs: dependabot
-    runs-on: ubuntu-latest
-    if: ${{ needs.dependabot.outputs.package-ecosystem == 'docker' }}
-    permissions:
-      packages: write
-    outputs:
-      name: ${{ steps.config.outputs.name }}
-    defaults:
-      run:
-        working-directory: .${{ needs.dependabot.outputs.directory }}
-    steps:
-      - uses: actions/checkout@v3
-      - id: config
-        name: Extract config version
-        env:
-          ARCH_PLATFORMS: '{"amd64":"linux/amd64","aarch64":"linux/arm64","armhf":"linux/arm/v7"}'
-          CONFIG_FILE: config.json
+      - id: addon
         run: |
-          jq --argjson archs "$ARCH_PLATFORMS" -r '.platforms = (.arch | map($archs[.]) | map(select(.)) | join(",")) | {name, slug, version, image, platforms} | to_entries | map("\(.key)=\(.value)") | join("\n")' "$CONFIG_FILE" >> "$GITHUB_OUTPUT"
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Login to GHCR
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build container
-        run: docker build -t ${{ steps.config.outputs.image }}:${{ github.sha }} .
-      - name: Test container
-        uses: plexsystems/container-structure-test-action@v0.3.0
-        with:
-          image: ${{ steps.config.outputs.image }}:${{ github.sha }}
-          config: .${{ needs.dependabot.outputs.directory }}/test.yaml
-      - name: Push container
-        uses: docker/build-push-action@v4
-        with:
-          context: .${{ needs.dependabot.outputs.directory }}
-          platforms: ${{ steps.config.outputs.platforms }}
-          push: true
-          tags: |
-            ${{ steps.config.outputs.image }}:${{ needs.dependabot.outputs.new-version }}
-          labels: |
-            org.opencontainers.image.source=https://github.com/${{ github.repository }}
-            org.opencontainers.image.revision=${{ github.sha }}
+          (jq -r '"slug=\(.slug)"' config.json >> "$GITHUB_OUTPUT") || exit
 
   update:
-    needs: [dependabot, build]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      CONFIG_FILE: .${{ needs.dependabot.outputs.directory }}/config.json
-      NEW_VERSION: ${{ needs.dependabot.outputs.new-version }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref }}
-      - name: Update addon config
-        run: |
-          jq --arg version "$NEW_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
-          mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
-      - name: Commit changes
-        env:
-          ADDON: ${{ needs.build.outputs.name }}
-        run: |
-          git ls-files --modified --error-unmatch -- "$CONFIG_FILE" || exit 0
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add "$CONFIG_FILE"
-          git commit -m "Version bump $ADDON to $NEW_VERSION"
-          git push --quiet
+    needs: dependabot
+    if: ${{ needs.dependabot.outputs.addon }}
+    uses: ./.github/workflows/update.yml
+    with:
+      addon: ${{ needs.dependabot.outputs.addon }}
+      version: ${{ needs.dependabot.outputs.new-version }}

@@ -1,0 +1,45 @@
+name: Update addon version
+
+on:
+  workflow_call:
+    inputs:
+      addon:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+    outputs:
+      ref:
+        value: ${{ jobs.update.outputs.ref }}
+        description: The commit ref if a change was made.
+    secrets:
+      token:
+        required: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    outputs:
+      ref: ${{ steps.commit.outputs.ref }}
+    env:
+      CONFIG_FILE: "${{ inputs.addon }}/config.json"
+      DOCKERFILE: "${{ inputs.addon }}/Dockerfile"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update files
+        env:
+          NEW_VERSION: ${{ inputs.version }}
+        run: |
+          jq --arg version "$NEW_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
+          sed -i -e "s/:.*/:${NEW_VERSION}/" "$DOCKERFILE"
+          mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
+      - id: commit
+        name: Commit changes
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add "$CONFIG_FILE" "$DOCKERFILE"
+          git commit -m "Version bump ${{ inputs.addon }} to ${{ inputs.version }}" || exit 0
+          git push --quiet
+          git log --pretty=format:'ref=%H' -1 >> "$GITHUB_OUTPUT"

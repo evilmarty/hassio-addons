@@ -1,0 +1,76 @@
+name: Check and update addon
+
+on:
+  workflow_call:
+    inputs:
+      addon:
+        required: true
+        type: string
+      validate:
+        type: boolean
+        default: false
+      publish:
+        type: boolean
+        default: false
+    outputs:
+      ref:
+        value: ${{ jobs.update.outputs.ref }}
+        description: The commit ref if a change was made.
+      digest:
+        value: ${{ jobs.build.outputs.digest }}
+        description: The published container image digest. Not set if not published.
+      image:
+        value: ${{ jobs.build.outputs.image }}
+        description: The addon's configured image.
+      version:
+        value: ${{ jobs.build.outputs.version }}
+        description: The addon's configured version.
+    secrets:
+      token:
+        required: true
+  workflow_dispatch:
+    inputs:
+      addon:
+        required: true
+        type: string
+        description: The addon slug.
+      validate:
+        type: boolean
+        description: Validate the config and dockerfile versions.
+      publish:
+        type: boolean
+        default: false
+        description: Publish the built addon.
+
+jobs:
+  check:
+    name: Check addon for updates
+    uses: ./.github/workflows/check.yml
+    with:
+      addon: ${{ inputs.addon }}
+      validate: ${{ inputs.validate }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+
+  update:
+    name: Update addon files
+    needs: check
+    if: needs.check.outputs.local_version != needs.check.outputs.remote_version
+    uses: ./.github/workflows/update.yml
+    with:
+      addon: ${{ inputs.addon }}
+      version: ${{ needs.check.outputs.remote_version }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    name: Build and test addon
+    needs: update
+    if: ${{ needs.update.outputs.ref }}
+    uses: ./.github/workflows/build.yml
+    with:
+      addon: ${{ inputs.addon }}
+      publish: ${{ inputs.publish }}
+      ref: ${{ needs.update.outputs.ref }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

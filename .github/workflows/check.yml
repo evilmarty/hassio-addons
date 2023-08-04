@@ -1,0 +1,79 @@
+name: Check addon version
+
+on:
+  workflow_call:
+    inputs:
+      addon:
+        required: true
+        type: string
+      validate:
+        type: boolean
+        default: false
+    outputs:
+      local_version:
+        value: ${{ jobs.check.outputs.local_version }}
+        description: The local addon's version.
+      remote_version:
+        value: ${{ jobs.check.outputs.remote_version }}
+        description: The remote container's version.
+    secrets:
+      token:
+        required: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      local_version: ${{ steps.config.outputs.version }}
+      remote_version: ${{ steps.remote.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: config
+        name: Extract config version
+        run: |
+          jq -r '"version=\(.version)"' ${{ inputs.addon }}/config.json >> "$GITHUB_OUTPUT"
+      - id: dockerfile
+        name: Extract dockerfile tag
+        run: |
+          from=$(awk '{if ($1 == "FROM") {print $2}}' ${{ inputs.addon }}/Dockerfile)
+          image_tag="${from##*/}" # Extract image and tag
+          repo_user="${from%/*}" # Extract repo and user
+          user="${repo_user#*/}"
+          repo="${repo_user%/*}"
+          if [[ "$repo_user" == "$user" ]]; then
+            repo="index.docker.io" # Must be in format 'someone/foobar'
+          fi
+          echo "image=${image_tag%:*}" >> "$GITHUB_OUTPUT"
+          echo "tag=${image_tag#*:}" >> "$GITHUB_OUTPUT"
+          echo "user=${user}" >> "$GITHUB_OUTPUT"
+          echo "repo=${repo}" >> "$GITHUB_OUTPUT"
+      - name: Validate version
+        if: inputs.validate
+        env:
+          CONFIG_VERSION: ${{ steps.config.outputs.version }}
+          IMAGE_TAG: ${{ steps.dockerfile.outputs.tag }}
+        run: |
+          test "$IMAGE_TAG" == "$CONFIG_VERSION"
+      - id: remote
+        name: Fetch image version
+        env:
+          IMAGE: "${{ steps.dockerfile.outputs.user }}/${{ steps.dockerfile.outputs.image }}"
+          REPO: ${{ steps.dockerfile.outputs.repo }}
+        run: |
+          digest=latest
+          media_type='application/vnd.docker.distribution.manifest.list.v2+json'
+          token=$(curl -sG --data-urlencode "scope=repository:${IMAGE}:pull" "https://${REPO}/token" | jq -r '.token')
+          while [[ "$media_type" == 'application/vnd.docker.distribution.manifest.list.v2+json' ]]; do
+            response=$(curl -s \
+              --header 'Accept: application/vnd.docker.distribution.manifest.v2+json' \
+              --header "Authorization: Bearer ${token}" \
+              "https://${REPO}/v2/${IMAGE}/manifests/${digest}")
+            media_type=$(echo $response | jq -r .mediaType)
+            digest=$(echo $response | jq -r '.manifests | first | .digest')
+          done
+          digest=$(echo $response | jq -r .config.digest)
+          EXT_VERSION=$(curl -sL \
+            --header "Authorization: Bearer ${token}" \
+            "https://${REPO}/v2/${IMAGE}/blobs/${digest}" \
+            | jq -r '.container_config // .config | .Labels["org.opencontainers.image.version"]')
+          echo "version=${EXT_VERSION}" >> "$GITHUB_OUTPUT"

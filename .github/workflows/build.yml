@@ -1,0 +1,86 @@
+name: Build and test addon
+
+on:
+  workflow_call:
+    inputs:
+      addon:
+        required: true
+        type: string
+      publish:
+        type: boolean
+        default: false
+      ref:
+        type: string
+    outputs:
+      digest:
+        value: ${{ jobs.build.outputs.digest }}
+        description: The published container image digest. Not set if not published.
+      image:
+        value: ${{ jobs.build.outputs.image }}
+        description: The addon's configured image.
+      version:
+        value: ${{ jobs.build.outputs.version }}
+        description: The addon's configured version.
+    secrets:
+      token:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.config.outputs.image }}
+      version: ${{ steps.config.outputs.version }}
+      digest: ${{ steps.publish.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref || github.ref_name }}
+      - id: config
+        name: Extract config version
+        env:
+          ARCH_PLATFORMS: '{"amd64":"linux/amd64","aarch64":"linux/arm64","armhf":"linux/arm/v7"}'
+          CONFIG_FILE: "${{ inputs.addon }}/config.json"
+        run: |
+          jq --argjson archs "$ARCH_PLATFORMS" -r '.platforms = (.arch | map($archs[.]) | map(select(.)) | join(",")) | {version, image, platforms} | to_entries | map("\(.key)=\(.value)") | join("\n")' "$CONFIG_FILE" >> "$GITHUB_OUTPUT"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - id: container
+        name: Build test container
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ inputs.addon }}
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha
+          tags: |
+            ${{ inputs.addon }}:${{ github.sha }}
+      - name: Test container
+        uses: plexsystems/container-structure-test-action@v0.2.0
+        with:
+          image: "${{ inputs.addon }}:${{ github.sha }}"
+          config: ${{ inputs.addon }}/test.yaml
+      - name: Login to GHCR
+        if: inputs.publish
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.token }}
+      - id: publish
+        name: Push container
+        if: inputs.publish
+        uses: docker/build-push-action@v3
+        with:
+          context: ${{ inputs.addon }}
+          platforms: ${{ steps.config.outputs.platforms }}
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha
+          tags: |
+            ${{ steps.config.outputs.image }}:${{ steps.config.outputs.version }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
