@@ -57,7 +57,7 @@ jobs:
       - name: Build test container
         run: docker build -t ${{ inputs.addon }}:${{ github.sha }} ${{ inputs.addon }}
       - name: Test container
-        uses: plexsystems/container-structure-test-action@v0.2.0
+        uses: plexsystems/container-structure-test-action@v0.3.0
         with:
           image: "${{ inputs.addon }}:${{ github.sha }}"
           config: ${{ inputs.addon }}/test.yaml
