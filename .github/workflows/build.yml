@@ -47,21 +47,6 @@ jobs:
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - id: container
-        name: Build test container
-        uses: docker/build-push-action@v4
-        with:
-          context: ${{ inputs.addon }}
-          push: false
-          cache-from: type=gha
-          cache-to: type=gha
-          tags: |
-            ${{ inputs.addon }}:${{ github.sha }}
-      - name: Test container
-        uses: plexsystems/container-structure-test-action@v0.2.0
-        with:
-          image: "${{ inputs.addon }}:${{ github.sha }}"
-          config: ${{ inputs.addon }}/test.yaml
       - name: Login to GHCR
         if: inputs.publish
         uses: docker/login-action@v2
@@ -69,16 +54,21 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.token }}
+      - name: Build test container
+        run: docker build -t ${{ inputs.addon }}:${{ github.sha }} ${{ inputs.addon }}
+      - name: Test container
+        uses: plexsystems/container-structure-test-action@v0.2.0
+        with:
+          image: "${{ inputs.addon }}:${{ github.sha }}"
+          config: ${{ inputs.addon }}/test.yaml
       - id: publish
         name: Push container
         if: inputs.publish
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v3
         with:
           context: ${{ inputs.addon }}
           platforms: ${{ steps.config.outputs.platforms }}
           push: true
-          cache-from: type=gha
-          cache-to: type=gha
           tags: |
             ${{ steps.config.outputs.image }}:${{ steps.config.outputs.version }}
           labels: |
