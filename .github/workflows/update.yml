@@ -39,7 +39,7 @@ jobs:
           NEW_VERSION: ${{ inputs.version }}
         run: |
           jq --arg version "$NEW_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
-          sed -i -e "s/:.*/:${NEW_VERSION}/" "$DOCKERFILE"
+          sed -i -e "/^FROM/s/:.*/:${NEW_VERSION}/" "$DOCKERFILE"
           mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
       - id: commit
         name: Commit changes
