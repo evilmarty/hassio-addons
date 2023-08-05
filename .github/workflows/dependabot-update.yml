@@ -17,6 +17,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - id: addon
+        if: ${{ steps.metadata.outputs.directory != '/' }}
         run: |
           cd .${{ steps.metadata.outputs.directory }}
           test -f config.json || exit
