@@ -18,15 +18,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: master
-      - uses: actions/checkout@v3
+          fetch-depth: 2
       - id: addons
         name: Determine changed addons
         run: |
-          git diff --name-only origin/master | awk -F '/' '{ print $1 }' | sort -u | xargs -I % -n 1 jq -r .slug %/config.json 2>/dev/null | jq -rnR '"changed=\([inputs]|@json)"' >> "$GITHUB_OUTPUT"
+          git diff --name-only -r HEAD^1 HEAD | awk -F '/' '{ print $1 }' | sort -u | xargs -I % -n 1 jq -r .slug %/config.json 2>/dev/null | jq -rnR '"changed=\([inputs]|@json)"' >> "$GITHUB_OUTPUT"
 
   build:
     needs: inspect
+    if: needs.inspect.outputs.addons != '[]'
     strategy:
       matrix:
         addon: ${{ fromJSON(needs.inspect.outputs.addons) }}
