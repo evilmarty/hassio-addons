@@ -64,7 +64,7 @@ jobs:
       - id: publish
         name: Push container
         if: inputs.publish
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: ${{ inputs.addon }}
           platforms: ${{ steps.config.outputs.platforms }}
