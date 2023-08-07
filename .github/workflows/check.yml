@@ -9,6 +9,8 @@ on:
       validate:
         type: boolean
         default: false
+      ref:
+        type: string
     outputs:
       local_version:
         value: ${{ jobs.check.outputs.local_version }}
@@ -28,6 +30,9 @@ jobs:
       remote_version: ${{ steps.remote.outputs.version }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          token: ${{ secrets.token }}
       - id: config
         name: Extract config version
         run: |

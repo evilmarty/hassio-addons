@@ -12,6 +12,8 @@ on:
       publish:
         type: boolean
         default: false
+      ref:
+        type: string
     outputs:
       ref:
         value: ${{ jobs.update.outputs.ref }}
@@ -49,6 +51,7 @@ jobs:
     with:
       addon: ${{ inputs.addon }}
       validate: ${{ inputs.validate }}
+      ref: ${{ inputs.ref }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -60,6 +63,7 @@ jobs:
     with:
       addon: ${{ inputs.addon }}
       version: ${{ needs.check.outputs.remote_version }}
+      ref: ${{ inputs.ref }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
 
