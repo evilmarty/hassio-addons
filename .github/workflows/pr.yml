@@ -34,6 +34,6 @@ jobs:
     with:
       addon: ${{ matrix.addon }}
       publish: ${{ github.event.pull_request.merged == true }}
-      ref: ${{ github.head_ref }}
+      ref: ${{ github.sha }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
