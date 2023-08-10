@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/check-update-build.yml
     with:
       addon: ${{ matrix.addon }}
-      publish: ${{ (github.event_name == "schedule") || inputs.publish }}
+      publish: ${{ github.event_name == 'schedule' || inputs.publish }}
       ref: ${{ github.ref }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
