@@ -33,7 +33,7 @@ jobs:
       version: ${{ steps.config.outputs.version }}
       digest: ${{ steps.publish.outputs.digest }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref || github.ref_name }}
           token: ${{ secrets.token }}
