@@ -45,7 +45,7 @@ jobs:
         run: |
           jq --argjson archs "$ARCH_PLATFORMS" -r '.platforms = (.arch | map($archs[.]) | map(select(.)) | join(",")) | {version, image, platforms} | to_entries | map("\(.key)=\(.value)") | join("\n")' "$CONFIG_FILE" >> "$GITHUB_OUTPUT"
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to GHCR
