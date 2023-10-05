@@ -1,3 +1,3 @@
-FROM ghcr.io/linuxserver/sabnzbd:4.1.0-ls128
+FROM ghcr.io/linuxserver/sabnzbd:4.1.0-ls129
 COPY rootfs /
 VOLUME /data /media /share /ssl
