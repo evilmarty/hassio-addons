@@ -1,6 +1,6 @@
 {
   "name": "Livebook",
-  "version": "0.11.4",
+  "version": "0.12.0",
   "slug": "livebook",
   "description": "Automate code & data workflows with interactive notebooks",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/livebook",
