@@ -1,8 +1,8 @@
 schemaVersion: "2.0.0"
 
 fileExistenceTests:
-  - name: Sonarr.exe
-    path: /app/sonarr/bin/Sonarr.exe
+  - name: Sonarr
+    path: /app/sonarr/bin/Sonarr
     shouldExist: true
     permissions: "-rw-r--r--"
     uid: 0
@@ -12,16 +12,9 @@ fileContentTests:
   - name: Sonarr run
     path: /etc/s6-overlay/s6-rc.d/svc-sonarr/run
     expectedContents:
-      - "s6-setuidgid abc mono --debug Sonarr.exe"
+      - "s6-setuidgid abc --debug Sonarr"
       - "-data=/data/config"
       - "-nobrowser"
-
-commandTests:
-  - name: Mono
-    command: mono
-    args: [--version]
-    expectedOutput: ["Mono JIT compiler version 6.12."]
-    exitCode: 0
 
 metadataTest:
   exposedPorts:
