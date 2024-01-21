@@ -1,0 +1,58 @@
+name: Check and create PR
+
+on:
+  workflow_call:
+    inputs:
+      addon:
+        required: true
+        type: string
+      validate:
+        type: boolean
+        default: false
+      ref:
+        type: string
+    outputs:
+      ref:
+        value: ${{ jobs.pr.outputs.ref }}
+        description: The ref of the PR
+      url:
+        value: ${{ jobs.pr.outputs.url }}
+        description: The PR url
+      version:
+        value: ${{ jobs.check.outputs.remote_version }}
+        description: The addon's configured version.
+    secrets:
+      token:
+        required: true
+  workflow_dispatch:
+    inputs:
+      addon:
+        required: true
+        type: string
+        description: The addon slug.
+      validate:
+        type: boolean
+        description: Validate the config and dockerfile versions.
+
+jobs:
+  check:
+    name: Check addon for updates
+    uses: ./.github/workflows/check.yml
+    with:
+      addon: ${{ inputs.addon }}
+      validate: ${{ inputs.validate }}
+      ref: ${{ inputs.ref }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+
+  pr:
+    name: Update addon files
+    needs: check
+    if: needs.check.outputs.local_version != needs.check.outputs.remote_version
+    uses: ./.github/workflows/create-pr.yml
+    with:
+      addon: ${{ inputs.addon }}
+      version: ${{ needs.check.outputs.remote_version }}
+      ref: ${{ inputs.ref }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

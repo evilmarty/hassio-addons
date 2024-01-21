@@ -1,0 +1,55 @@
+name: Create PR
+
+on:
+  workflow_call:
+    inputs:
+      addon:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      ref:
+        type: string
+    outputs:
+      url:
+        value: ${{ jobs.pr.outputs.url }}
+        description: The PR url
+      ref:
+        value: ${{ jobs.pr.outputs.ref }}
+        description: The ref of the PR
+    secrets:
+      token:
+        required: true
+
+jobs:
+  pr:
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.create.outputs.pull-request-url }}
+      ref: ${{ steps.create.outputs.pull-request-head-sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          token: ${{ secrets.token }}
+      - name: Update files
+        env:
+          NEW_VERSION: ${{ inputs.version }}
+          CONFIG_FILE: "${{ inputs.addon }}/config.json"
+          DOCKERFILE: "${{ inputs.addon }}/Dockerfile"
+        run: |
+          jq --arg version "$NEW_VERSION" '. + {version: $version}' "$CONFIG_FILE" > "${CONFIG_FILE}.new"
+          sed -i -e "/^FROM/s/:.*/:${NEW_VERSION}/" "$DOCKERFILE"
+          mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
+      - id: create
+        name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.token }}
+          branch: "update/${{ inputs.addon }}/${{ inputs.version }}"
+          delete-branch: true
+          labels: docker,addon
+          commit-message: "Version bump ${{ inputs.addon }} to ${{ inputs.version }}"
+          title: "Version bump ${{ inputs.addon }} to ${{ inputs.version }}"
+          committer: "github-actions <github-actions@github.com>"

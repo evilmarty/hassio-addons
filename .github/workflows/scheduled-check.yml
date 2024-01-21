@@ -4,21 +4,15 @@ on:
   schedule:
     - cron: '0 12 * * *'
   workflow_dispatch:
-    inputs:
-      publish:
-        type: boolean
-        default: true
-        description: Publish the updated addons.
 
 jobs:
   main:
     strategy:
       matrix:
         addon: [ sabnzbd, sonarr, radarr, lidarr ]
-    uses: ./.github/workflows/check-update-build.yml
+    uses: ./.github/workflows/check-create-pr.yml
     with:
       addon: ${{ matrix.addon }}
-      publish: ${{ github.event_name == 'schedule' || inputs.publish }}
       ref: ${{ github.ref }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
