@@ -1,5 +1,9 @@
 name: Build pull request
 on:
+  push:
+    paths:
+      - '*/Dockerfile'
+      - '*/rootfs/**'
   pull_request:
     paths:
       - '*/Dockerfile'
@@ -33,7 +37,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       addon: ${{ matrix.addon }}
-      publish: ${{ github.event.pull_request.merged == true }}
+      publish: ${{ github.event.pull_request && github.event.pull_request.merged == true }}
       ref: ${{ github.sha }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
