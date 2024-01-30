@@ -1,9 +1,5 @@
 name: Build pull request
 on:
-  push:
-    paths:
-      - '*/Dockerfile'
-      - '*/rootfs/**'
   pull_request:
     paths:
       - '*/Dockerfile'
