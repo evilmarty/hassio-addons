@@ -5,8 +5,8 @@ fileExistenceTests:
     path: /app/sonarr/bin/Sonarr
     shouldExist: true
     permissions: "-rwxr-xr-x"
-    uid: 0
-    gid: 0
+    uid: 1001
+    gid: 127
 
 fileContentTests:
   - name: Sonarr run
