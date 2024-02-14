@@ -4,11 +4,6 @@ on:
     paths:
       - '*/Dockerfile'
       - '*/rootfs/**'
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - closed
 
 jobs:
   inspect:
