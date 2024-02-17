@@ -1,0 +1,34 @@
+name: Check build
+on:
+  push:
+    paths:
+      - '*/Dockerfile'
+      - '*/rootfs/**'
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    outputs:
+      addons: ${{ steps.addons.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: addons
+        name: Determine changed addons
+        run: |
+          git diff --name-only -r HEAD^1 HEAD | awk -F '/' '{ print $1 }' | sort -u | xargs -I % -n 1 jq -r .slug %/config.json 2>/dev/null | jq -rnR '"changed=\([inputs]|@json)"' >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: inspect
+    if: needs.inspect.outputs.addons != '[]'
+    strategy:
+      matrix:
+        addon: ${{ fromJSON(needs.inspect.outputs.addons) }}
+    uses: ./.github/workflows/build.yml
+    with:
+      addon: ${{ matrix.addon }}
+      publish: ${{ github.event.pull_request && github.event.pull_request.merged == true }}
+      ref: ${{ github.sha }}
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
