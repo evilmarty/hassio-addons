@@ -25,6 +25,7 @@ on:
 jobs:
   pr:
     runs-on: ubuntu-latest
+    environment: publisher
     outputs:
       url: ${{ steps.create.outputs.pull-request-url }}
       ref: ${{ steps.create.outputs.pull-request-head-sha }}
