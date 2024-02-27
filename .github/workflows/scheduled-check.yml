@@ -7,6 +7,7 @@ on:
 
 jobs:
   main:
+    environment: publisher
     strategy:
       matrix:
         addon: [ sabnzbd, sonarr, radarr, lidarr ]
@@ -15,4 +16,4 @@ jobs:
       addon: ${{ matrix.addon }}
       ref: ${{ github.ref }}
     secrets:
-      token: ${{ secrets.GITHUB_TOKEN }}
+      token: ${{ secrets.PAT }}
