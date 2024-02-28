@@ -7,7 +7,6 @@ on:
 
 jobs:
   main:
-    environment: publisher
     strategy:
       matrix:
         addon: [ sabnzbd, sonarr, radarr, lidarr ]
