@@ -53,3 +53,11 @@ jobs:
           commit-message: "Version bump ${{ inputs.addon }} to ${{ inputs.version }}"
           title: "Version bump ${{ inputs.addon }} to ${{ inputs.version }}"
           committer: "github-actions <github-actions@github.com>"
+  build:
+    needs: pr
+    uses: ./.github/workflows/build.yml
+    with:
+      addon: ${{ inputs.addon }}
+      ref: ${{ needs.pr.outputs.ref }}
+    secrets:
+      token: ${{ secrets.token }}
