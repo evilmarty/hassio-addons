@@ -9,6 +9,9 @@ on:
       validate:
         type: boolean
         default: false
+      publish:
+        type: boolean
+        default: false
       ref:
         type: string
     outputs:
@@ -53,6 +56,7 @@ jobs:
     with:
       addon: ${{ inputs.addon }}
       version: ${{ needs.check.outputs.remote_version }}
+      publish: ${{ inputs.publish }}
       ref: ${{ inputs.ref }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
