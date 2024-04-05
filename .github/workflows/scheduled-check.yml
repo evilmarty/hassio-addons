@@ -13,6 +13,7 @@ jobs:
     uses: ./.github/workflows/check-create-pr.yml
     with:
       addon: ${{ matrix.addon }}
+      publish: true
       ref: ${{ github.ref }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
