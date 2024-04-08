@@ -2,8 +2,8 @@ name: Check build
 on:
   push:
     paths:
-      - '*/Dockerfile'
-      - '*/rootfs/**'
+      - "*/Dockerfile"
+      - "*/rootfs/**"
 
 jobs:
   inspect:
@@ -21,7 +21,7 @@ jobs:
 
   build:
     needs: inspect
-    if: needs.inspect.outputs.addons != '[]'
+    if: ${{ needs.inspect.outputs.addons != '[]' }}
     strategy:
       matrix:
         addon: ${{ fromJSON(needs.inspect.outputs.addons) }}
