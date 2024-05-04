@@ -1,6 +1,6 @@
 {
   "name": "Sonarr",
-  "version": "4.0.4.1491-ls236",
+  "version": "4.0.4.1491-ls237",
   "slug": "sonarr",
   "description": "Sonarr is a PVR for usenet and bittorrent users.",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/sonarr",
