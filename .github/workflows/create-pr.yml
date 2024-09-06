@@ -47,7 +47,7 @@ jobs:
           mv -f "${CONFIG_FILE}.new" "$CONFIG_FILE"
       - id: create
         name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.token }}
           branch: "update/${{ inputs.addon }}/${{ inputs.version }}"
