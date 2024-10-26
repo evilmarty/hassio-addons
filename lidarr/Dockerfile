@@ -1,3 +1,3 @@
-FROM ghcr.io/linuxserver/lidarr:2.6.4.4402-ls15
+FROM ghcr.io/linuxserver/lidarr:2.7.1.4417-ls16
 COPY rootfs /
 VOLUME /data /media /share /ssl
