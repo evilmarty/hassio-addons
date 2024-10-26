@@ -1,6 +1,6 @@
 {
   "name": "Lidarr",
-  "version": "2.6.4.4402-ls15",
+  "version": "2.7.1.4417-ls16",
   "slug": "lidarr",
   "description": "Lidarr is a music collection manager for Usenet and BitTorrent users.",
   "url": "https://github.com/evilmarty/hassio-addons/tree/master/lidarr",
