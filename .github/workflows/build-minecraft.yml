@@ -6,17 +6,25 @@ on:
     paths:
       - minecraft/Dockerfile
       - minecraft/rootfs/**
+      - minecraft_bedrock/Dockerfile
+      - minecraft_bedrock/rootfs/**
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        addon: [minecraft, minecraft_bedrock]
     steps:
       - uses: actions/checkout@v4
       - id: config
         name: Extract config version
         run: |
-          awk ' /image:/ { print "image=" $2 }' minecraft/config.yaml | tr -d '"' >> "$GITHUB_OUTPUT"
-          awk ' /version:/ { print "version=" $2 }' minecraft/config.yaml | tr -d '"' >> "$GITHUB_OUTPUT"
+          awk ' /image:/ { print "image=" $2 }' "$CONFIG_PATH" | tr -d '"' >> "$GITHUB_OUTPUT"
+          awk ' /version:/ { print "version=" $2 }' "$CONFIG_PATH" | tr -d '"' >> "$GITHUB_OUTPUT"
+        env:
+          CONFIG_PATH: "${{ matrix.addon }}/config.yaml"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -31,7 +39,7 @@ jobs:
         name: Push container
         uses: docker/build-push-action@v6
         with:
-          context: minecraft
+          context: ${{ matrix.addon }}
           platforms: linux/amd64
           push: true
           tags: |

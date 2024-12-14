@@ -1,0 +1,81 @@
+name: "Minecraft: Bedrock Edition Server"
+version: "1.21.51.01-a"
+slug: "minecraft_bedrock"
+description: "Run a private server for Minecraft: Bedrock Edition."
+url: "https://github.com/evilmarty/hassio-addons/tree/master/minecraft_bedrock"
+image: "ghcr.io/evilmarty/hassio-minecraft-bedrock"
+arch:
+  - amd64
+startup: "application"
+init: true
+boot: "auto"
+host_network: true
+watchdog: "tcp://[HOST]:[PORT:19132]"
+ports:
+  "19132/tcp": 19132
+  "19133/tcp": 19133
+ports_description:
+  "19132/tcp": "Used for gameplay and LAN discovery"
+  "19133/tcp": "Used for gameplay"
+map:
+  - config:rw
+environment:
+  PUID: "0"
+  PGID: "0"
+options:
+  server-name: My World
+  gamemode: survival
+  force-gamemode: false
+  difficulty: easy
+  allow-cheats: false
+  max-players: 10
+  level-name: Bedrock level
+  online-mode: true
+  allow-list: false
+  view-distance: 32
+  player-idle-timeout: 30
+  max-threads: 8
+  tick-distance: 4
+  default-player-permission-level: member
+  texturepack-required: false
+  compression-threshold: 1
+  compression-algorithm: zlib
+  server-authoritative-movement: server-auth
+  player-position-acceptance-threshold: 0.5
+  player-movement-action-direction-threshold: 0.85
+  server-authoritative-block-breaking: false
+  server-authoritative-block-breaking-pick-range-scalar: 1.5
+  chat-restriction: None
+  disable-player-interaction: false
+  client-side-chunk-generation-enabled: true
+  block-network-ids-are-hashes: true
+  disable-custom-skins: false
+schema:
+  server-name: str
+  gamemode: list(survival|creative|adventure|spectator)
+  force-gamemode: bool
+  difficulty: list(peaceful|easy|normal|hard)
+  allow-cheats: bool
+  max-players: int(0,)
+  level-name: str
+  level-seed: str?
+  online-mode: bool
+  allow-list: bool
+  view-distance: int(3,32)
+  player-idle-timeout: int
+  max-threads: int(0,)
+  tick-distance: int(4,12)
+  default-player-permission-level: list(visitor|member|operator)
+  texturepack-required: bool
+  compression-threshold: int(0,)
+  compression-algorithm: list(zlib|snappy)
+  server-authoritative-movement: list(client-auth|server-auth|server-auth-with-rewind)
+  player-position-acceptance-threshold: float(0.0,)
+  player-movement-action-direction-threshold: float
+  server-authoritative-block-breaking: bool
+  server-authoritative-block-breaking-pick-range-scalar: float(1.0,)
+  chat-restriction: list(None|Dropped|Disabled)
+  disable-player-interaction: bool
+  client-side-chunk-generation-enabled: bool
+  block-network-ids-are-hashes: bool
+  disable-custom-skins: bool
