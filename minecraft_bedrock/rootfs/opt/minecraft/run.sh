@@ -9,7 +9,7 @@ INSTANCE_DIR="instance"
 main() {
   bashio::log.debug "Working directory is ${PWD}"
 
-  mkdir "$INSTANCE_DIR"
+  mkdir -p "$INSTANCE_DIR"
   cd "$INSTANCE_DIR" || exit 1
 
   write_server_properties "${SERVER_PROPERTIES_PATH}"
