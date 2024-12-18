@@ -1,5 +1,5 @@
 name: "Minecraft: Bedrock Edition Server"
-version: "1.21.51.01-a"
+version: "1.21.51.01-b"
 slug: "minecraft_bedrock"
 description: "Run a private server for Minecraft: Bedrock Edition."
 url: "https://github.com/evilmarty/hassio-addons/tree/master/minecraft_bedrock"

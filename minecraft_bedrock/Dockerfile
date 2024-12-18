@@ -21,7 +21,7 @@ RUN curl -L \
   && unzip -q bedrock-server-${BEDROCK_SERVER_VERSION}.zip \
   && rm -f bedrock-server-${BEDROCK_SERVER_VERSION}.zip
 CMD ["/opt/minecraft/run.sh"]
-VOLUME /data /share
+VOLUME /data
 WORKDIR /data
 LABEL \
   io.hass.version="${BUILD_VERSION}" \
