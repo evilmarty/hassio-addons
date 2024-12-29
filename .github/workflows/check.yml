@@ -66,18 +66,18 @@ jobs:
           REPO: ${{ steps.dockerfile.outputs.repo }}
         run: |
           digest=latest
-          media_type='application/vnd.docker.distribution.manifest.list.v2+json'
+          media_type='application/vnd.oci.image.index.v1+json'
           token=$(curl -sG --data-urlencode "scope=repository:${IMAGE}:pull" "https://${REPO}/token" | jq -r '.token')
-          while [[ "$media_type" == 'application/vnd.docker.distribution.manifest.list.v2+json' ]]; do
-            response=$(curl -s \
-              --header 'Accept: application/vnd.docker.distribution.manifest.v2+json' \
+          while [[ "$media_type" == 'application/vnd.oci.image.index.v1+json' ]]; do
+            response=$(curl --silent \
+              --header "Accept: ${media_type}" \
               --header "Authorization: Bearer ${token}" \
               "https://${REPO}/v2/${IMAGE}/manifests/${digest}")
-            media_type=$(echo $response | jq -r .mediaType)
+            media_type=$(echo $response | jq -r '.manifests | first | .mediaType')
             digest=$(echo $response | jq -r '.manifests | first | .digest')
           done
           digest=$(echo $response | jq -r .config.digest)
-          EXT_VERSION=$(curl -sL \
+          EXT_VERSION=$(curl --silent --location \
             --header "Authorization: Bearer ${token}" \
             "https://${REPO}/v2/${IMAGE}/blobs/${digest}" \
             | jq -r '.container_config // .config | .Labels["org.opencontainers.image.version"]')
