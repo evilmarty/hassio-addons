@@ -1,3 +1,3 @@
-FROM ghcr.io/linuxserver/radarr:5.16.3.9541-ls252
+FROM ghcr.io/linuxserver/radarr:5.17.2.9580-ls253
 COPY rootfs /
 VOLUME /data /media /share /ssl
