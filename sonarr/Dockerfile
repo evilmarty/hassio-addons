@@ -1,3 +1,3 @@
-FROM ghcr.io/linuxserver/sonarr:4.0.11.2680-ls264
+FROM ghcr.io/linuxserver/sonarr:4.0.12.2823-ls265
 COPY rootfs /
 VOLUME /data /media /share /ssl
