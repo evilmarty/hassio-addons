@@ -6,7 +6,7 @@ fileExistenceTests:
     shouldExist: true
     permissions: "-rwxr-xr-x"
     uid: 1001
-    gid: 127
+    gid: 128
 
 fileContentTests:
   - name: Sonarr run
