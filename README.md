@@ -15,5 +15,3 @@ These are the addons:
 - [Radarr](radarr/README.md) - **Deprecated** Run Radarr within Home Assistant.
 - [Lidarr](lidarr/README.md) - **Deprecated** Run Lidarr within Home Assistant.
 - [SABnzbd](sabnzbd/README.md) - **Deprecated** Run SABnzbd within Home Assistant.
-- [Eufy Security](eufy-security/README.md) - Eufy Security MQTT Gateway.
-- [Let's Encrypt](letsencrypt/README.md) - Similar to the official addon but uses the Let's Encrypt Go Client, which supports more DNS providers. **Unmaintained**
