@@ -1,3 +1,5 @@
+**Deprecation notice** This add-on will no longer receive updates. Please migrate to the HA community add-on.
+
 # Home Assistant Add-on: SABnzbd
 
 SABnzbd is an Open Source Binary Newsreader written in Python.
@@ -7,6 +9,17 @@ SABnzbd is an Open Source Binary Newsreader written in Python.
 ## About
 
 This add-on allows you to run SABnzbd within Home Assistant. It is based off of [linuxserver.io's Docker image](https://github.com/linuxserver/docker-sabnzbd).
+
+## Migrate to community add-on
+
+1. Stop this add-on, if it is running. **Do not** uninstall yet as you may lose data.
+2. Install the Home Assistant Community add-ons version of SABnzbd.
+3. Start the Community version of SABnzbd and then stop it. This is to ensure the add-on's folders are created.
+4. SSH onto the Home Assistant server. Do not use the Terminal add-on as this may not give you access to the `addons` folder.
+5. Navigate to the supervisor folder. This might be `/mnt/data/supervisor` for HAOS or something else. It should contain the `addons` and `addon_configs` folders.
+6. Copy the files by running `cp -fR addons/data/22e52f96_sabnzbd/config/* addon_configs/a0d7b954_sabnzbd`
+7. Start the community version of SABnzbd and verify all data is there and working.
+8. When comfortable with the outcome you can uninstall this version of SABnzbd.
 
 ## Installation
 
