@@ -37,7 +37,7 @@ commandTests:
     command: /usr/bin/curl
     args: [--version]
     expectedOutput:
-      - "curl 7."
+      - "curl 8."
     exitCode: 0
 
 metadataTest:
