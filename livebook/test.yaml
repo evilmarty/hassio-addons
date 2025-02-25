@@ -31,7 +31,7 @@ commandTests:
     command: /usr/bin/jq
     args: [--version]
     expectedOutput:
-      - "jq-1.6"
+      - "jq-1.7"
     exitCode: 0
   - name: curl
     command: /usr/bin/curl
