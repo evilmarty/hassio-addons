@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - '*/Dockerfile'
+      - '*/test.ya?ml'
       - '*/rootfs/**'
 
 jobs:
@@ -13,11 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
       - id: addons
         name: Determine changed addons
+        env:
+          START_REF: HEAD
+          END_REF: "HEAD~${{ (github.event.pull_request && github.event.pull_request.commits) || 1}}"
         run: |
-          git diff --name-only -r HEAD^1 HEAD | awk -F '/' '{ print $1 }' | sort -u | xargs -I % -n 1 jq -r .slug %/config.json 2>/dev/null | jq -rnR '"changed=\([inputs]|@json)"' >> "$GITHUB_OUTPUT"
+          git diff --name-only -r "$START_REF" "$END_REF" | awk -F '/' '{ print $1 }' | sort -u | xargs -I % -n 1 jq -r .slug %/config.json 2>/dev/null | jq -rnR '"changed=\([inputs]|@json)"' >> "$GITHUB_OUTPUT"
 
   build:
     needs: inspect
@@ -28,7 +32,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       addon: ${{ matrix.addon }}
-      publish: ${{ github.event.pull_request && github.event.pull_request.merged == true }}
+      publish: ${{ github.event.pull_request && github.event.pull_request.merged }}
       ref: ${{ github.sha }}
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
