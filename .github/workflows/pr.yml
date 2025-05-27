@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - '*/Dockerfile'
+      - '*/test.ya?ml'
       - '*/rootfs/**'
 
 jobs:
