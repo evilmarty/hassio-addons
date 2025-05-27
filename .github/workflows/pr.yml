@@ -1,6 +1,11 @@
 name: Build pull request
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
     paths:
       - '*/Dockerfile'
       - '*/test.ya?ml'
