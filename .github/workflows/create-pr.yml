@@ -32,7 +32,7 @@ jobs:
       url: ${{ steps.create.outputs.pull-request-url }}
       ref: ${{ steps.create.outputs.pull-request-head-sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ inputs.ref || github.sha }}
           token: ${{ secrets.token }}
