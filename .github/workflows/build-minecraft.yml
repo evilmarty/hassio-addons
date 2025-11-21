@@ -17,7 +17,7 @@ jobs:
       matrix:
         addon: [minecraft, minecraft_bedrock]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - id: config
         name: Extract config version
         run: |
