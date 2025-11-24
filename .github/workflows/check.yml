@@ -29,7 +29,7 @@ jobs:
       local_version: ${{ steps.config.outputs.version }}
       remote_version: ${{ steps.remote.outputs.version }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref || github.sha }}
           token: ${{ secrets.token }}
