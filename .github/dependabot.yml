@@ -3,10 +3,8 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "friday"
+      interval: "monthly"
   - package-ecosystem: "docker"
     directory: "livebook/"
     schedule:
-      interval: "weekly"
-      day: "friday"
+      interval: "monthly"
