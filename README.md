@@ -8,6 +8,7 @@ A personal repository for home-assistant.io.
 
 These are the addons:
 
+- [yarr](yarr/README.md) - Run yarr, yet another RSS reader, within Home Assistant.
 - [Livebook](livebook/README.md) - **Deprecated** Run Livebook within Home Assistant.
 - [Minecraft (Java)](minecraft/README.md) - **Deprecated** Run a Minecraft: Java Edition Server within Home Assistant.
 - [Minecraft (Bedrock)](minecraft_bedrock/README.md) - **Deprecated** Run a Minecraft: Bedrock Edition Server within Home Assistant.

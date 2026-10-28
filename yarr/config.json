@@ -1,0 +1,45 @@
+{
+  "name": "yarr",
+  "version": "v2.9",
+  "slug": "yarr",
+  "description": "Yet another RSS reader",
+  "url": "https://github.com/evilmarty/hassio-addons/tree/master/yarr",
+  "image": "ghcr.io/evilmarty/hassio-yarr",
+  "arch": [
+    "amd64",
+    "aarch64"
+  ],
+  "startup": "application",
+  "init": false,
+  "webui": "[PROTO:ssl]://[HOST]:[PORT:7070]",
+  "watchdog": "tcp://[HOST]:[PORT:7070]",
+  "ports": {
+    "7070/tcp": 7070
+  },
+  "ports_description": {
+    "7070/tcp": "The port used to serve the application"
+  },
+  "map": [
+    "ssl:ro"
+  ],
+  "environment": {
+    "YARR_ADDR": "0.0.0.0:7070"
+  },
+  "options": {
+    "database": "/data/yarr.db",
+    "client_timeout": "30s",
+    "ssl": false,
+    "certfile": "fullchain.pem",
+    "keyfile": "privkey.pem"
+  },
+  "schema": {
+    "username": "str?",
+    "password": "password?",
+    "base_path": "str?",
+    "database": "str",
+    "client_timeout": "match(^[0-9]+(ms|s|m|h)$)",
+    "ssl": "bool",
+    "certfile": "str",
+    "keyfile": "str"
+  }
+}

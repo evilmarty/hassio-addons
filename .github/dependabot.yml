@@ -8,3 +8,7 @@ updates:
     directory: "livebook/"
     schedule:
       interval: "monthly"
+  - package-ecosystem: "docker"
+    directory: "yarr/"
+    schedule:
+      interval: "monthly"

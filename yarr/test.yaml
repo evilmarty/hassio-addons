@@ -1,0 +1,43 @@
+schemaVersion: "2.0.0"
+
+fileExistenceTests:
+  - name: yarr
+    path: /usr/local/bin/yarr
+    shouldExist: true
+  - name: init
+    path: /init
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 0
+    gid: 0
+
+commandTests:
+  - name: yarr
+    command: /usr/local/bin/yarr
+    args: [-version]
+    expectedOutput:
+      - "v2\\."
+    exitCode: 0
+  - name: bashio
+    command: /usr/bin/bashio
+    args: [--help]
+    expectedOutput:
+      - "source: source filename \\[arguments\\]"
+    exitCode: 2
+  - name: jq
+    command: /usr/bin/jq
+    args: [--version]
+    expectedOutput:
+      - "jq-1."
+    exitCode: 0
+  - name: curl
+    command: /usr/bin/curl
+    args: [--version]
+    expectedOutput:
+      - "curl 8."
+    exitCode: 0
+
+metadataTest:
+  volumes: ["/data"]
+  entrypoint: ["/init"]
+  cmd: ["/usr/local/bin/yarr"]

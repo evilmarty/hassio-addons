@@ -1,0 +1,28 @@
+#!/usr/bin/env bashio
+
+export_option() {
+  local name="$1"
+  local key="$2"
+
+  if bashio::config.has_value "$key"; then
+    export "${name}=$(bashio::config "$key")"
+  fi
+}
+
+export_option YARR_BASE base_path
+export_option YARR_DB database
+export_option YARR_CLIENT_TIMEOUT client_timeout
+
+if bashio::config.has_value 'username' || bashio::config.has_value 'password'; then
+  bashio::config.require.username
+  bashio::config.require.password
+  export YARR_AUTH="$(bashio::config 'username'):$(bashio::config 'password')"
+fi
+
+bashio::config.require.ssl
+if bashio::config.true 'ssl'; then
+  export YARR_CERTFILE="/ssl/$(bashio::config 'certfile')"
+  export YARR_KEYFILE="/ssl/$(bashio::config 'keyfile')"
+fi
+
+exec "$@"
