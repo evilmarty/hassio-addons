@@ -22,7 +22,7 @@ commandTests:
     command: /usr/bin/bashio
     args: [--help]
     expectedOutput:
-      - "source: source filename \\[arguments\\]"
+      - "source: source (\\[-p path\\] )?filename \\[arguments\\]"
     exitCode: 2
   - name: jq
     command: /usr/bin/jq
