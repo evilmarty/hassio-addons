@@ -12,3 +12,7 @@ updates:
     directory: "yarr/"
     schedule:
       interval: "monthly"
+  - package-ecosystem: "docker"
+    directory: "layerling/"
+    schedule:
+      interval: "monthly"

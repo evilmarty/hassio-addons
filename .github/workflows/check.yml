@@ -66,4 +66,8 @@ jobs:
           REPO: ${{ steps.dockerfile.outputs.repo }}
         run: |
           EXT_VERSION=$(scripts/get-container-label.sh org.opencontainers.image.version "$REPO" "$IMAGE")
+          # Layerling labels releases with "v", but publishes image tags without it.
+          if [[ "$REPO/$IMAGE" == "ghcr.io/henmedia/layerling" ]]; then
+            EXT_VERSION="${EXT_VERSION#v}"
+          fi
           echo "version=${EXT_VERSION}" >> "$GITHUB_OUTPUT"

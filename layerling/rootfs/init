@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+
+install -d -o nextjs -g nodejs /data/projects /data/project-thumbnails
+
+exec setpriv --reuid=nextjs --regid=nodejs --init-groups "$@"

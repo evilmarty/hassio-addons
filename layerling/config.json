@@ -1,0 +1,24 @@
+{
+  "name": "Layerling",
+  "version": "1.136.0",
+  "slug": "layerling",
+  "description": "Easy 3D CAD for 3D printing, in your browser",
+  "url": "https://github.com/evilmarty/hassio-addons/tree/master/layerling",
+  "image": "ghcr.io/evilmarty/hassio-layerling",
+  "arch": [
+    "amd64",
+    "aarch64"
+  ],
+  "startup": "application",
+  "init": false,
+  "webui": "http://[HOST]:[PORT:3000]",
+  "watchdog": "http://[HOST]:[PORT:3000]",
+  "ports": {
+    "3000/tcp": 3000
+  },
+  "ports_description": {
+    "3000/tcp": "The port used to serve the application"
+  },
+  "options": {},
+  "schema": {}
+}

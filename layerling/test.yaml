@@ -1,0 +1,30 @@
+schemaVersion: "2.0.0"
+
+fileExistenceTests:
+  - name: init
+    path: /init
+    shouldExist: true
+    permissions: "-rwxr-xr-x"
+    uid: 0
+    gid: 0
+
+commandTests:
+  - name: persistent storage is writable by the non-root runtime
+    command: /init
+    args:
+      - sh
+      - -ec
+      - |
+        test "$(id -u)" -eq 999
+        test "$(id -g)" -eq 999
+        test "$LAYERLING_SHARED_PROJECTS_DIR" = /data/projects
+        touch /data/projects/storage-test
+        touch /app/.codex/project-thumbnails/storage-test
+        test -f /data/project-thumbnails/storage-test
+        rm /data/projects/storage-test /data/project-thumbnails/storage-test
+    exitCode: 0
+
+metadataTest:
+  volumes: ["/data"]
+  entrypoint: ["/init"]
+  cmd: ["node", "node_modules/next/dist/bin/next", "start", "apps/web"]
