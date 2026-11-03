@@ -10,18 +10,77 @@ fileExistenceTests:
 
 commandTests:
   - name: persistent storage is writable by the non-root runtime
-    command: /init
+    command: sh
     args:
-      - sh
       - -ec
       - |
-        test "$(id -u)" -eq 999
-        test "$(id -g)" -eq 999
-        test "$LAYERLING_SHARED_PROJECTS_DIR" = /data/projects
-        touch /data/projects/storage-test
-        touch /app/.codex/project-thumbnails/storage-test
-        test -f /data/project-thumbnails/storage-test
-        rm /data/projects/storage-test /data/project-thumbnails/storage-test
+        mkdir -p /data
+        printf '{}\n' > /data/options.json
+        exec /init sh -ec '
+          test "$(id -u)" -eq 999
+          test "$(id -g)" -eq 999
+          test "$LAYERLING_SHARED_PROJECTS_DIR" = /data/projects
+          test "$LAYERLING_DEFAULT_THEME" = system
+          test "$LAYERLING_SIMPLE_MODE" = false
+          test "$LAYERLING_NEW_DESIGNS_ON_SERVER" = always
+          test "${LAYERLING_MCP_REMOTE-unset}" = unset
+          touch /data/projects/storage-test
+          touch /app/.codex/project-thumbnails/storage-test
+          test -f /data/project-thumbnails/storage-test
+          rm /data/projects/storage-test /data/project-thumbnails/storage-test
+        '
+    exitCode: 0
+  - name: configuration maps to upstream environment variables
+    command: sh
+    args:
+      - -ec
+      - |
+        mkdir -p /data
+        cat > /data/options.json <<'JSON'
+        {
+          "default_theme": "graphite",
+          "simple_mode": "always",
+          "new_designs_on_server": "false",
+          "allowed_origins": "https://cad.example.com,https://other.example.com",
+          "user_header": "X-Forwarded-Email",
+          "mcp_remote": true,
+          "mcp_token": "test-token-with-$-and-spaces '",
+          "mcp_allowed_hosts": "cad.example.com,other.example.com"
+        }
+        JSON
+        exec /init node -e '
+          const assert = require("node:assert/strict");
+          const options = require("/data/options.json");
+          for (const [key, value] of Object.entries(options)) {
+            assert.equal(process.env[`LAYERLING_${key.toUpperCase()}`], String(value));
+          }
+        '
+    exitCode: 0
+  - name: explicit false disables MCP remote access
+    command: sh
+    args:
+      - -ec
+      - |
+        mkdir -p /data
+        printf '{"mcp_remote":false}\n' > /data/options.json
+        export LAYERLING_MCP_REMOTE=true
+        exec /init sh -ec 'test "$LAYERLING_MCP_REMOTE" = false'
+    exitCode: 0
+  - name: MCP remote access rejects missing or short tokens
+    command: sh
+    args:
+      - -ec
+      - |
+        mkdir -p /data
+        for options in '{"mcp_remote":true}' '{"mcp_remote":true,"mcp_token":"                short                "}'; do
+          printf '%s\n' "$options" > /data/options.json
+          if /init true > /tmp/layerling-init-error 2>&1; then
+            echo "MCP startup unexpectedly accepted an invalid token." >&2
+            exit 1
+          fi
+          grep -q 'requires mcp_token' /tmp/layerling-init-error
+        done
+        rm /tmp/layerling-init-error
     exitCode: 0
 
 metadataTest:

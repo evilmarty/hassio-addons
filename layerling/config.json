@@ -19,6 +19,19 @@
   "ports_description": {
     "3000/tcp": "The port used to serve the application"
   },
-  "options": {},
-  "schema": {}
+  "options": {
+    "default_theme": "system",
+    "simple_mode": "false",
+    "new_designs_on_server": "always"
+  },
+  "schema": {
+    "default_theme": "list(system|light|dark|graphite)",
+    "simple_mode": "list(false|true|always)",
+    "new_designs_on_server": "list(false|true|always)",
+    "allowed_origins": "str?",
+    "user_header": "str?",
+    "mcp_remote": "bool?",
+    "mcp_token": "password?",
+    "mcp_allowed_hosts": "str?"
+  }
 }

@@ -1,5 +1,41 @@
-#!/bin/sh
-set -eu
+#!/usr/bin/env bashio
+
+if ! jq -e 'type == "object"' /data/options.json > /dev/null; then
+  bashio::exit.nok "Layerling configuration must be a JSON object in /data/options.json."
+fi
+
+# The upstream image has no Home Assistant base init to populate Bashio's cache.
+(umask 077; bashio::cache.set "addons.self.options.config" "$(< /data/options.json)")
+
+export_option() {
+  local name="$1"
+  local key="$2"
+  local value
+
+  if bashio::config.has_value "$key"; then
+    value=$(bashio::config "$key")
+    export "${name}=${value}"
+  fi
+}
+
+export_option LAYERLING_DEFAULT_THEME default_theme
+export_option LAYERLING_SIMPLE_MODE simple_mode
+export_option LAYERLING_NEW_DESIGNS_ON_SERVER new_designs_on_server
+export_option LAYERLING_ALLOWED_ORIGINS allowed_origins
+export_option LAYERLING_USER_HEADER user_header
+export_option LAYERLING_MCP_REMOTE mcp_remote
+export_option LAYERLING_MCP_TOKEN mcp_token
+export_option LAYERLING_MCP_ALLOWED_HOSTS mcp_allowed_hosts
+
+if [ "${LAYERLING_MCP_REMOTE:-false}" = "true" ]; then
+  if ! jq -en --arg token "${LAYERLING_MCP_TOKEN:-}" \
+    '$token | gsub("^\\s+|\\s+$"; "") | length >= 16' > /dev/null; then
+    bashio::log.fatal "Enabling MCP remote access requires mcp_token with at least 16 non-padding characters."
+    exit 1
+  fi
+fi
+
+bashio::cache.flush "addons.self.options.config"
 
 install -d -o nextjs -g nodejs /data/projects /data/project-thumbnails
 
