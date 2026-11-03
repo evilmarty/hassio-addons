@@ -10,77 +10,89 @@ fileExistenceTests:
 
 commandTests:
   - name: persistent storage is writable by the non-root runtime
-    command: sh
+    command: node
     args:
-      - -ec
+      - -e
       - |
-        mkdir -p /data
-        printf '{}\n' > /data/options.json
-        exec /init sh -ec '
-          test "$(id -u)" -eq 999
-          test "$(id -g)" -eq 999
-          test "$LAYERLING_SHARED_PROJECTS_DIR" = /data/projects
-          test "$LAYERLING_DEFAULT_THEME" = system
-          test "$LAYERLING_SIMPLE_MODE" = false
-          test "$LAYERLING_NEW_DESIGNS_ON_SERVER" = always
-          test "${LAYERLING_MCP_REMOTE-unset}" = unset
-          touch /data/projects/storage-test
-          touch /app/.codex/project-thumbnails/storage-test
-          test -f /data/project-thumbnails/storage-test
-          rm /data/projects/storage-test /data/project-thumbnails/storage-test
-        '
+        const fs = require("node:fs");
+        const { execFileSync } = require("node:child_process");
+        fs.mkdirSync("/data", { recursive: true });
+        fs.writeFileSync("/data/options.json", "{}");
+        execFileSync("/init", ["node", "-e", `
+          const assert = require("node:assert/strict");
+          const fs = require("node:fs");
+          assert.equal(process.getuid(), 999);
+          assert.equal(process.getgid(), 999);
+          assert.equal(process.env.LAYERLING_SHARED_PROJECTS_DIR, "/data/projects");
+          assert.equal(process.env.LAYERLING_DEFAULT_THEME, "system");
+          assert.equal(process.env.LAYERLING_SIMPLE_MODE, "false");
+          assert.equal(process.env.LAYERLING_NEW_DESIGNS_ON_SERVER, "always");
+          assert.equal(process.env.LAYERLING_MCP_REMOTE, undefined);
+          fs.writeFileSync("/data/projects/storage-test", "project");
+          fs.writeFileSync("/app/.codex/project-thumbnails/storage-test", "thumbnail");
+          assert.equal(fs.readFileSync("/data/project-thumbnails/storage-test", "utf8"), "thumbnail");
+          fs.unlinkSync("/data/projects/storage-test");
+          fs.unlinkSync("/data/project-thumbnails/storage-test");
+        `], { stdio: "inherit" });
     exitCode: 0
   - name: configuration maps to upstream environment variables
-    command: sh
+    command: node
     args:
-      - -ec
+      - -e
       - |
-        mkdir -p /data
-        cat > /data/options.json <<'JSON'
-        {
+        const fs = require("node:fs");
+        const { execFileSync } = require("node:child_process");
+        fs.mkdirSync("/data", { recursive: true });
+        fs.writeFileSync("/data/options.json", JSON.stringify({
           "default_theme": "graphite",
           "simple_mode": "always",
           "new_designs_on_server": "false",
           "allowed_origins": "https://cad.example.com,https://other.example.com",
           "user_header": "X-Forwarded-Email",
           "mcp_remote": true,
-          "mcp_token": "test-token-with-$-and-spaces '",
+          "mcp_token": "test-token-with-\u0024-and-spaces '",
           "mcp_allowed_hosts": "cad.example.com,other.example.com"
-        }
-        JSON
-        exec /init node -e '
+        }));
+        execFileSync("/init", ["node", "-e", `
           const assert = require("node:assert/strict");
           const options = require("/data/options.json");
           for (const [key, value] of Object.entries(options)) {
-            assert.equal(process.env[`LAYERLING_${key.toUpperCase()}`], String(value));
+            assert.equal(process.env["LAYERLING_" + key.toUpperCase()], String(value));
           }
-        '
+        `], { stdio: "inherit" });
     exitCode: 0
   - name: explicit false disables MCP remote access
-    command: sh
+    command: node
     args:
-      - -ec
+      - -e
       - |
-        mkdir -p /data
-        printf '{"mcp_remote":false}\n' > /data/options.json
-        export LAYERLING_MCP_REMOTE=true
-        exec /init sh -ec 'test "$LAYERLING_MCP_REMOTE" = false'
+        const fs = require("node:fs");
+        const { execFileSync } = require("node:child_process");
+        fs.mkdirSync("/data", { recursive: true });
+        fs.writeFileSync("/data/options.json", '{"mcp_remote":false}');
+        execFileSync("/init", ["node", "-e", `
+          require("node:assert/strict").equal(process.env.LAYERLING_MCP_REMOTE, "false");
+        `], { env: { ...process.env, LAYERLING_MCP_REMOTE: "true" }, stdio: "inherit" });
     exitCode: 0
   - name: MCP remote access rejects missing or short tokens
-    command: sh
+    command: node
     args:
-      - -ec
+      - -e
       - |
-        mkdir -p /data
-        for options in '{"mcp_remote":true}' '{"mcp_remote":true,"mcp_token":"                short                "}'; do
-          printf '%s\n' "$options" > /data/options.json
-          if /init true > /tmp/layerling-init-error 2>&1; then
-            echo "MCP startup unexpectedly accepted an invalid token." >&2
-            exit 1
-          fi
-          grep -q 'requires mcp_token' /tmp/layerling-init-error
-        done
-        rm /tmp/layerling-init-error
+        const assert = require("node:assert/strict");
+        const fs = require("node:fs");
+        const { spawnSync } = require("node:child_process");
+        fs.mkdirSync("/data", { recursive: true });
+        for (const options of [
+          { mcp_remote: true },
+          { mcp_remote: true, mcp_token: "                short                " }
+        ]) {
+          fs.writeFileSync("/data/options.json", JSON.stringify(options));
+          const result = spawnSync("/init", ["true"], { encoding: "utf8" });
+          assert.ifError(result.error);
+          assert.equal(result.status, 1, "MCP startup must reject an invalid token");
+          assert.match(result.stderr, /requires mcp_token/);
+        }
     exitCode: 0
 
 metadataTest:
